@@ -1,0 +1,32 @@
+# Project page for the watermark-distillation project.
+# Served by GitHub Pages from the /docs folder of cs294-288-dcllms/fingerprint-sft
+# (Settings -> Pages -> Deploy from a branch -> main, /docs).
+
+title: "[Method name TBD]"
+description: "Detecting watermark distillation from a single student response."
+url: "https://cs294-288-dcllms.github.io"
+baseurl: "/fingerprint-sft"   # must match the repo name; change if the site moves
+repo_url: "https://github.com/cs294-288-dcllms/fingerprint-sft"
+
+# Build settings (same stack as chang-han-chen.github.io)
+markdown: kramdown
+kramdown:
+  input: GFM
+  math_engine: mathjax
+  auto_ids: true
+highlighter: rouge
+timezone: America/Los_Angeles
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: article
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - vendor
+  - .bundle
+  - .jekyll-cache
