@@ -22,22 +22,14 @@
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body id="top">
-  <main>
+  <a class="skip-link" href="#article-content">Skip to article</a>
+  <main id="article-content">
     {{ content }}
+    <footer class="site-footer">
+      <p>&copy; {{ 'now' | date: "%Y" }} The authors</p>
+      <p class="template-credit">Style inspired by <a href="https://arnav0400.github.io/subspace-tuning-emergent-misalignment/">Subspace Tuning</a>.</p>
+    </footer>
   </main>
-
-  <footer class="site-footer">
-    <p>&copy; {{ 'now' | date: "%Y" }} The authors</p>
-    <p class="template-credit">Layout inspired by <a href="https://aakaran.github.io/finetuning_with_sampling/">Finetuning with Sampling</a> and <a href="https://nerfies.github.io/">Nerfies</a>.</p>
-  </footer>
-  <script>
-    // Size each embedded animation to its content; the animation posts its own height.
-    addEventListener('message', function (e) {
-      if (!e.data || e.data.type !== 'anim-height') return;
-      document.querySelectorAll('.anim-embed iframe').forEach(function (f) {
-        if (f.contentWindow === e.source) f.style.height = e.data.h + 'px';
-      });
-    });
-  </script>
+  <script defer src="{{ '/assets/js/demos.js' | relative_url }}"></script>
 </body>
 </html>

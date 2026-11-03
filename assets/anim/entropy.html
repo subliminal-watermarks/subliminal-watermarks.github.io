@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Entropy laundering, step by step</title>
 <style>
-  :root { --blue: #1477AC; --ink: #2b2d31; --muted: #6a737d; --line: #e3e5e8; }
+  :root { --blue: #1a73c7; --ink: #252525; --muted: #666666; --line: #e5e5e5; }
   html, body { margin: 0; background: #fff; color: var(--ink);
                font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
   .wrap { max-width: 960px; margin: 0 auto; }
@@ -14,12 +14,12 @@
   .controls { display: flex; align-items: center; gap: 8px; padding: 6px 12px 10px; flex-wrap: wrap;
               font-size: 13px; color: var(--muted); }
   .controls button { font: inherit; border: 1px solid var(--line); background: #fff; color: var(--ink);
-                     border-radius: 999px; padding: 4px 11px; cursor: pointer; }
-  .controls button:hover { background: #f5f6f7; }
+                     border-radius: 3px; padding: 6px 12px; min-height: 40px; cursor: pointer; }
+  .controls button:hover { background: #fff; border-color: var(--blue); }
   .controls button:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
   .steps { display: flex; gap: 6px; flex-wrap: wrap; margin-left: 4px; }
   .steps button { padding: 3px 9px; }
-  .steps button[aria-current="step"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .steps button[aria-current="step"] { background: #fff; color: var(--blue); border-color: var(--blue); }
   .play { min-width: 74px; }
 </style>
 </head>
@@ -33,24 +33,24 @@
       <rect width="6" height="6" fill="#f3f4f6"/><line x1="0" y1="0" x2="0" y2="6" stroke="#d5d8dc" stroke-width="2"/>
     </pattern>
   </defs>
-  <text id="step-title" x="40" y="46" font-size="22" font-weight="600" fill="#2b2d31"></text>
-  <text x="40" y="84" font-size="13" fill="#6a737d">Teacher’s reasoning trace, sampled with a watermark (excerpt)</text>
+  <text id="step-title" x="40" y="46" font-size="22" font-weight="600" fill="#252525"></text>
+  <text x="40" y="84" font-size="13" fill="#666666">Teacher’s reasoning trace, sampled with a watermark (excerpt)</text>
   <g id="passage"></g>
   <g id="overlay"></g>
-  <text id="caption1" x="40" y="490" font-size="15" fill="#6a737d"></text>
-  <text id="caption2" x="40" y="512" font-size="15" fill="#6a737d"></text>
+  <text id="caption1" x="40" y="490" font-size="15" fill="#666666"></text>
+  <text id="caption2" x="40" y="512" font-size="15" fill="#666666"></text>
 </svg>
 <div class="controls" role="group" aria-label="Animation controls">
-  <button id="prev" aria-label="Previous step">◀</button>
-  <button id="play" class="play" aria-label="Pause">❚❚ Pause</button>
-  <button id="next" aria-label="Next step">▶</button>
+  <button type="button" id="prev" aria-label="Previous step">◀</button>
+  <button type="button" id="play" class="play" aria-label="Pause">❚❚ Pause</button>
+  <button type="button" id="next" aria-label="Next step">▶</button>
   <div class="steps" id="steps"></div>
 </div>
 </div>
 <script>
 const DATA = {"cutoff":0.4001,"corpus_rows":400,"tokens":[{"t":"Wait","h":1.583,"drop":true},{"t":",","h":0.013,"drop":false},{"t":" each","h":1.469,"drop":true},{"t":" carbon","h":0.009,"drop":false},{"t":" in","h":1.11,"drop":true},{"t":" eth","h":0.383,"drop":false},{"t":"ane","h":0.02,"drop":false},{"t":" has","h":1.376,"drop":true},{"t":" three","h":0.212,"drop":false},{"t":" hydro","h":0.179,"drop":false},{"t":"gens","h":0.0,"drop":false},{"t":",","h":0.701,"drop":true},{"t":" but","h":0.671,"drop":true},{"t":" here","h":1.074,"drop":true},{"t":" each","h":1.177,"drop":true},{"t":" carbon","h":1.033,"drop":true},{"t":" is","h":0.661,"drop":true},{"t":" attached","h":0.819,"drop":true},{"t":" to","h":0.001,"drop":false},{"t":" three","h":0.008,"drop":false},{"t":" chlor","h":0.033,"drop":false},{"t":"ines","h":0.001,"drop":false},{"t":".","h":0.802,"drop":true},{"t":" Chlor","h":0.316,"drop":false},{"t":"ine","h":0.026,"drop":false},{"t":" is","h":0.033,"drop":false},{"t":" a","h":1.142,"drop":true},{"t":" large","h":0.873,"drop":true},{"t":" atom","h":0.863,"drop":true},{"t":",","h":1.28,"drop":true},{"t":" but","h":1.914,"drop":true},{"t":" more","h":1.501,"drop":true},{"t":" importantly","h":0.126,"drop":false},{"t":",","h":0.0,"drop":false},{"t":" it","h":1.084,"drop":true},{"t":"'s","h":0.245,"drop":false},{"t":" more","h":1.447,"drop":true},{"t":" electr","h":0.007,"drop":false},{"t":"one","h":0.0,"drop":false},{"t":"g","h":0.001,"drop":false},{"t":"ative","h":0.001,"drop":false},{"t":".","h":0.447,"drop":true}],"insets":[{"i":0,"top":[["So",0.3805],["Now",0.3358],["Wait",0.1235],["Each",0.0583],["The",0.0454]]},{"i":19,"top":[["three",0.9991],["two",0.0005],["chlor",0.0002],["(space)",0.0001],["one",0.0]]}]};
 const NS = 'http://www.w3.org/2000/svg';
-const C = { blue: '#1477AC', ink: '#2b2d31', muted: '#6a737d', student: '#cfe6fb' };
+const C = { blue: '#1a73c7', ink: '#252525', muted: '#666666', student: '#fff' };
 function el(tag, attrs = {}, parent) {
   const e = document.createElementNS(NS, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
@@ -117,7 +117,7 @@ const INS = DATA.insets.slice().sort((a, b) => a.i - b.i).map((ins, k) => {
     el('text', { x, y: y + 4, 'font-size': 11.5, 'font-weight': 700, fill: '#fff', 'text-anchor': 'middle' }, gg).textContent = n; };
   el('rect', { x: tk.x0 - 3, y: tk.y - FS - 1, width: tk.x1 - tk.x0 + 6, height: FS + 13, rx: 6, fill: 'none', stroke: C.ink, 'stroke-width': 1.6 }, g);
   badge(tk.x0 - 2, tk.y - FS - 2, g);
-  el('rect', { x: bx, y: by, width: bw, height: bh, rx: 8, fill: '#fff', stroke: '#d6d9de' }, g);
+  el('rect', { x: bx, y: by, width: bw, height: bh, rx: 3, fill: '#fff', stroke: '#d6d9de' }, g);
   badge(bx + 16, by + 18, g);
   el('text', { x: bx + 32, y: by + 22, 'font-size': 12.5, 'font-weight': 600, fill: C.ink }, g).textContent = 'Student’s guesses';
   el('text', { x: bx + 14, y: by + 42, 'font-size': 12, fill: C.muted }, g).textContent = `Entropy = ${tk.h.toFixed(2)} nats`;
@@ -131,7 +131,7 @@ const INS = DATA.insets.slice().sort((a, b) => a.i - b.i).map((ins, k) => {
 });
 // ---------- student, for the training pass ----------
 const ST = el('g', {}, O), SX = 760, SY = LY + 70;
-el('rect', { x: SX, y: SY, width: 160, height: 64, rx: 12, fill: C.student }, ST);
+el('rect', { x: SX, y: SY, width: 160, height: 64, rx: 3, fill: C.student, stroke: '#e5e5e5' }, ST);
 el('text', { x: SX + 80, y: SY + 38, 'font-size': 17, 'font-weight': 600, 'text-anchor': 'middle', fill: C.ink }, ST).textContent = 'Student';
 const pulses = toks.map(tk => el('circle', { r: 4.5, fill: C.blue, opacity: 0 }, O));
 const cursor = el('rect', { height: 3, rx: 1.5, fill: C.ink, opacity: 0 }, O);
@@ -179,7 +179,7 @@ const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const HOLD = 2.6;
 let step = 0, start = performance.now(), playing = !reduce, pausedT = reduce ? 1 : 0;
 const titleEl = document.getElementById('step-title'), playBtn = document.getElementById('play'), stepsEl = document.getElementById('steps');
-STEPS.forEach((st, i) => { const b = document.createElement('button'); b.textContent = (i + 1) + '. ' + st.name;
+STEPS.forEach((st, i) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = (i + 1) + '. ' + st.name;
   b.addEventListener('click', () => go(i, true)); stepsEl.appendChild(b); st.btn = b; });
 function show(i, t) {
   STEPS.forEach((st, k) => st.btn.setAttribute('aria-current', k === i ? 'step' : 'false'));
@@ -197,10 +197,53 @@ document.getElementById('next').addEventListener('click', () => go(step + 1, tru
 function frame(now) { if (playing) { const e = (now - start) / 1000, d = STEPS[step].dur; show(step, e / d); if (e > d + HOLD) go(step + 1); }
   requestAnimationFrame(frame); }
 setPlaying(playing); show(0, pausedT); requestAnimationFrame(frame);
-window.__show = (i, t) => { playing = false; step = i; show(i, t); };
-// Tell the embedding page how tall this animation is, so its iframe never clips the controls.
-function postHeight() { try { parent.postMessage({ type: 'anim-height', h: document.documentElement.scrollHeight }, '*'); } catch (e) {} }
-addEventListener('load', postHeight); addEventListener('resize', postHeight); setTimeout(postHeight, 300);
+// Preserve the user's playback state when the containing demo is closed or the tab is hidden.
+let embedActive = true, resumeWhenVisible = false;
+function updatePlaybackVisibility() {
+  const visible = embedActive && !document.hidden;
+  if (!visible && playing) {
+    pausedT = clamp((performance.now() - start) / (STEPS[step].dur * 1000));
+    resumeWhenVisible = true;
+    setPlaying(false);
+  } else if (visible && resumeWhenVisible) {
+    resumeWhenVisible = false;
+    setPlaying(true);
+  }
+}
+addEventListener('message', (event) => {
+  if (event.source !== parent || event.origin !== location.origin) return;
+  if (event.data?.type === 'demo-visibility') {
+    embedActive = event.data.active === true;
+    updatePlaybackVisibility();
+    if (embedActive) postHeight();
+  } else if (event.data?.type === 'demo-measure') {
+    postHeight();
+  }
+});
+addEventListener('visibilitychange', updatePlaybackVisibility);
+document.querySelector('.controls').addEventListener('keydown', (event) => {
+  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+  event.preventDefault();
+  go(step + (event.key === 'ArrowRight' ? 1 : -1), true);
+});
+window.__show = (i, t) => {
+  setPlaying(false);
+  resumeWhenVisible = false;
+  step = Math.max(0, Math.min(STEPS.length - 1, i));
+  pausedT = clamp(t);
+  show(step, pausedT);
+};
+// Measure content, not the iframe viewport, so a narrower layout can also shrink again.
+function postHeight() {
+  if (parent === window) return;
+  const h = Math.ceil(document.querySelector('.wrap').getBoundingClientRect().height);
+  if (h > 0) parent.postMessage({ type: 'anim-height', h }, location.origin);
+}
+addEventListener('load', postHeight);
+addEventListener('resize', postHeight);
+if ('ResizeObserver' in window) new ResizeObserver(postHeight).observe(document.querySelector('.wrap'));
+if (document.fonts?.ready) document.fonts.ready.then(postHeight);
+postHeight();
 </script>
 </body>
 </html>

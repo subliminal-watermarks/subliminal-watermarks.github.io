@@ -1,7 +1,7 @@
 ---
 layout: default
 ---
-<article class="publication">
+<article class="publication {{ page.page_kind | default: 'story' }}">
   <header class="publication-header">
     <h1 class="publication-title">{{ page.title }}</h1>
 
@@ -16,6 +16,7 @@ layout: default
     </p>
     {% endif %}
 
+    <p class="publication-links">{% if page.page_kind == 'appendix' %}<a href="{{ '/' | relative_url }}">Article</a>{% else %}<a href="{{ '/appendix/' | relative_url }}">Appendix</a>{% endif %}<span aria-hidden="true">·</span><a href="{{ site.repo_url }}">Code</a></p>
     {% if page.date %}<p class="publication-date"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time></p>{% endif %}
     {% if page.draft %}
     <p class="draft-banner">Draft: not for circulation. Items marked <span class="todo-inline">TODO</span> are still open.</p>

@@ -1,0 +1,45 @@
+{
+  "provenance": "Original published blog tables, teacher-calibrated LLR; retained in docs/appendix.md.",
+  "unit": "individual response for science, individual action for coding",
+  "science": [
+    {
+      "condition": "Ordinary distillation",
+      "positive": 800,
+      "false_positive": 22,
+      "n": 800
+    },
+    {
+      "condition": "Entropy laundering",
+      "positive": 797,
+      "false_positive": 23,
+      "n": 800
+    },
+    {
+      "condition": "Grandchild laundering",
+      "positive": 799,
+      "false_positive": 15,
+      "n": 800
+    }
+  ],
+  "coding": [
+    {
+      "condition": "Child",
+      "positive": 268,
+      "false_positive": 22,
+      "n": 400,
+      "auroc": 0.9201
+    },
+    {
+      "condition": "Grandchild",
+      "positive": 277,
+      "false_positive": 17,
+      "n": 400,
+      "auroc": 0.9314
+    }
+  ],
+  "key_attribution": {
+    "keys": 2,
+    "responses_per_key": 800,
+    "llr_contrast_auroc": 1.0
+  }
+}
