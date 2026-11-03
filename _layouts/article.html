@@ -16,17 +16,6 @@ layout: default
     </p>
     {% endif %}
 
-    <nav class="publication-resources" aria-label="Project resources">
-      <a class="resource-button" href="{{ site.repo_url }}">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"/></svg>
-        <span>Code</span>
-      </a>
-      <a class="resource-button" href="#citation">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7m-7 4h7"/></svg>
-        <span>BibTeX</span>
-      </a>
-    </nav>
-
     {% if page.date %}<p class="publication-date"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time></p>{% endif %}
     {% if page.draft %}
     <p class="draft-banner">Draft: not for circulation. Items marked <span class="todo-inline">TODO</span> are still open.</p>
