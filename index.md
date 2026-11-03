@@ -49,9 +49,9 @@ The two token-pattern tests we evaluated find no statistically significant water
 <details class="demo-panel" id="entropy-demo">
   <summary><span class="demo-icon" aria-hidden="true">▶</span><span><strong>Watch entropy laundering</strong><small>Step through a real watermarked trace</small></span><span class="demo-indicator" aria-hidden="true">+</span></summary>
   <div class="demo-content">
-    <div class="anim-embed"><iframe data-demo-src="{{ '/assets/anim/entropy.html' | relative_url }}" title="Interactive demo: entropy laundering on a real watermarked trace" loading="lazy"></iframe></div>
+    <div class="anim-embed"><iframe data-demo-src="{{ '/assets/anim/entropy.html' | relative_url }}?v={{ site.time | date: '%s' }}" title="Interactive demo: entropy laundering on a real watermarked trace" loading="lazy"></iframe></div>
     <p class="demo-note">Use Play, Pause, or the numbered steps. Masked tokens stay in the context but contribute no training loss.</p>
-    <noscript><p><a href="{{ '/assets/anim/entropy.html' | relative_url }}">Open the entropy animation</a> in a browser with JavaScript enabled.</p></noscript>
+    <noscript><p><a href="{{ '/assets/anim/entropy.html' | relative_url }}?v={{ site.time | date: '%s' }}">Open the entropy animation</a> in a browser with JavaScript enabled.</p></noscript>
   </div>
 </details>
 
@@ -74,9 +74,9 @@ Detection requires two forward passes through the reference models and no access
 <details class="demo-panel" id="detector-demo">
   <summary><span class="demo-icon" aria-hidden="true">▶</span><span><strong>Watch the detector in action</strong><small>From paired references to a scored response</small></span><span class="demo-indicator" aria-hidden="true">+</span></summary>
   <div class="demo-content">
-    <div class="anim-embed"><iframe data-demo-src="{{ '/assets/anim/detector.html' | relative_url }}" title="Interactive demo: how the LLR detector scores a suspect answer" loading="lazy"></iframe></div>
+    <div class="anim-embed"><iframe data-demo-src="{{ '/assets/anim/detector.html' | relative_url }}?v={{ site.time | date: '%s' }}" title="Interactive demo: how the LLR detector scores a suspect answer" loading="lazy"></iframe></div>
     <p class="demo-note">Five steps, including a real science example. Use Play or move through the steps at your own pace.</p>
-    <noscript><p><a href="{{ '/assets/anim/detector.html' | relative_url }}">Open the detector animation</a> in a browser with JavaScript enabled.</p></noscript>
+    <noscript><p><a href="{{ '/assets/anim/detector.html' | relative_url }}?v={{ site.time | date: '%s' }}">Open the detector animation</a> in a browser with JavaScript enabled.</p></noscript>
   </div>
 </details>
 
