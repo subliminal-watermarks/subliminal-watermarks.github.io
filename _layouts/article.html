@@ -12,7 +12,7 @@ layout: default
     {% assign equal_authors = page.authors | where: "equal", true %}
     <p class="publication-affiliation">
       {% if page.affiliation %}<sup>1</sup>{{ page.affiliation }}{% endif %}
-      {% if equal_authors.size > 0 %}<span class="equal-contribution"><sup>*</sup>Equal contribution</span>{% endif %}
+      {% if equal_authors.size > 0 %}<span class="equal-contribution"><sup>*</sup>{{ page.equal_note | default: "Equal contribution" }}</span>{% endif %}
     </p>
     {% endif %}
 

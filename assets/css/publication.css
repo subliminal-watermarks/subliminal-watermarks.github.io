@@ -114,6 +114,7 @@ table { display: block; max-width: 100%; margin: 25px auto 30px; overflow-x: aut
 th, td { padding: 10px 14px; text-align: left; border: 0; border-bottom: 1px solid #e9e9e9; }
 thead th { color: var(--heading); font-weight: 600; border-bottom: 1px solid #888; }
 tbody tr:last-child td { border-bottom: 0; }
+.score-label { white-space: nowrap; }
 .table-wrap { margin: 25px 0 30px; overflow-x: auto; }
 table.paper-table { display: table; margin: 0 auto; font-size: 14px; }
 table.paper-table th, table.paper-table td { padding: 7px 12px; text-align: center; white-space: nowrap; border-bottom: 0; }
@@ -158,3 +159,7 @@ mjx-container[display="true"] { max-width: 100%; padding: 8px 0; overflow-x: aut
 /* Tables hug their columns; long numbered equations scroll inside their own box on phones */
 table:not(.paper-table) { width: max-content; }
 mjx-container[display="true"] { min-width: 0 !important; }
+
+/* Embedded step-through animations (assets/anim/*.html). On phones they keep a legible minimum width and scroll sideways. */
+.anim-embed { margin: 28px 0 32px; overflow-x: auto; }
+.anim-embed iframe { display: block; width: 100%; min-width: 640px; aspect-ratio: 960 / 600; border: 0; }

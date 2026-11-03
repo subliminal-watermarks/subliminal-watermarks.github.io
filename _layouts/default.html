@@ -30,5 +30,14 @@
     <p>&copy; {{ 'now' | date: "%Y" }} The authors</p>
     <p class="template-credit">Layout inspired by <a href="https://aakaran.github.io/finetuning_with_sampling/">Finetuning with Sampling</a> and <a href="https://nerfies.github.io/">Nerfies</a>.</p>
   </footer>
+  <script>
+    // Size each embedded animation to its content; the animation posts its own height.
+    addEventListener('message', function (e) {
+      if (!e.data || e.data.type !== 'anim-height') return;
+      document.querySelectorAll('.anim-embed iframe').forEach(function (f) {
+        if (f.contentWindow === e.source) f.style.height = e.data.h + 'px';
+      });
+    });
+  </script>
 </body>
 </html>

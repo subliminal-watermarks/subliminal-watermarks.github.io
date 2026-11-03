@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entropy laundering, step by step</title>
+<style>
+  :root { --blue: #1477AC; --ink: #2b2d31; --muted: #6a737d; --line: #e3e5e8; }
+  html, body { margin: 0; background: #fff; color: var(--ink);
+               font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 960px; margin: 0 auto; }
+  svg { display: block; width: 100%; height: auto; }
+  svg text { white-space: pre; }
+  .controls { display: flex; align-items: center; gap: 8px; padding: 6px 12px 10px; flex-wrap: wrap;
+              font-size: 13px; color: var(--muted); }
+  .controls button { font: inherit; border: 1px solid var(--line); background: #fff; color: var(--ink);
+                     border-radius: 999px; padding: 4px 11px; cursor: pointer; }
+  .controls button:hover { background: #f5f6f7; }
+  .controls button:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+  .steps { display: flex; gap: 6px; flex-wrap: wrap; margin-left: 4px; }
+  .steps button { padding: 3px 9px; }
+  .steps button[aria-current="step"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .play { min-width: 74px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<svg id="stage" viewBox="0 0 960 540" role="img" aria-labelledby="stage-title">
+  <title id="stage-title">Animated walk-through of entropy laundering on a real watermarked trace</title>
+  <defs>
+    <linearGradient id="heat" x1="0" x2="1" y1="0" y2="0"></linearGradient>
+    <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="6" height="6" fill="#f3f4f6"/><line x1="0" y1="0" x2="0" y2="6" stroke="#d5d8dc" stroke-width="2"/>
+    </pattern>
+  </defs>
+  <text id="step-title" x="40" y="46" font-size="22" font-weight="600" fill="#2b2d31"></text>
+  <text x="40" y="84" font-size="13" fill="#6a737d">Teacher’s reasoning trace, sampled with a watermark (excerpt)</text>
+  <g id="passage"></g>
+  <g id="overlay"></g>
+  <text id="caption1" x="40" y="490" font-size="15" fill="#6a737d"></text>
+  <text id="caption2" x="40" y="512" font-size="15" fill="#6a737d"></text>
+</svg>
+<div class="controls" role="group" aria-label="Animation controls">
+  <button id="prev" aria-label="Previous step">◀</button>
+  <button id="play" class="play" aria-label="Pause">❚❚ Pause</button>
+  <button id="next" aria-label="Next step">▶</button>
+  <div class="steps" id="steps"></div>
+</div>
+</div>
+<script>
+const DATA = {"cutoff":0.4001,"corpus_rows":400,"tokens":[{"t":"Wait","h":1.583,"drop":true},{"t":",","h":0.013,"drop":false},{"t":" each","h":1.469,"drop":true},{"t":" carbon","h":0.009,"drop":false},{"t":" in","h":1.11,"drop":true},{"t":" eth","h":0.383,"drop":false},{"t":"ane","h":0.02,"drop":false},{"t":" has","h":1.376,"drop":true},{"t":" three","h":0.212,"drop":false},{"t":" hydro","h":0.179,"drop":false},{"t":"gens","h":0.0,"drop":false},{"t":",","h":0.701,"drop":true},{"t":" but","h":0.671,"drop":true},{"t":" here","h":1.074,"drop":true},{"t":" each","h":1.177,"drop":true},{"t":" carbon","h":1.033,"drop":true},{"t":" is","h":0.661,"drop":true},{"t":" attached","h":0.819,"drop":true},{"t":" to","h":0.001,"drop":false},{"t":" three","h":0.008,"drop":false},{"t":" chlor","h":0.033,"drop":false},{"t":"ines","h":0.001,"drop":false},{"t":".","h":0.802,"drop":true},{"t":" Chlor","h":0.316,"drop":false},{"t":"ine","h":0.026,"drop":false},{"t":" is","h":0.033,"drop":false},{"t":" a","h":1.142,"drop":true},{"t":" large","h":0.873,"drop":true},{"t":" atom","h":0.863,"drop":true},{"t":",","h":1.28,"drop":true},{"t":" but","h":1.914,"drop":true},{"t":" more","h":1.501,"drop":true},{"t":" importantly","h":0.126,"drop":false},{"t":",","h":0.0,"drop":false},{"t":" it","h":1.084,"drop":true},{"t":"'s","h":0.245,"drop":false},{"t":" more","h":1.447,"drop":true},{"t":" electr","h":0.007,"drop":false},{"t":"one","h":0.0,"drop":false},{"t":"g","h":0.001,"drop":false},{"t":"ative","h":0.001,"drop":false},{"t":".","h":0.447,"drop":true}],"insets":[{"i":0,"top":[["So",0.3805],["Now",0.3358],["Wait",0.1235],["Each",0.0583],["The",0.0454]]},{"i":19,"top":[["three",0.9991],["two",0.0005],["chlor",0.0002],["(space)",0.0001],["one",0.0]]}]};
+const NS = 'http://www.w3.org/2000/svg';
+const C = { blue: '#1477AC', ink: '#2b2d31', muted: '#6a737d', student: '#cfe6fb' };
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const ease = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+const fade = (n, u) => n.setAttribute('opacity', clamp(u).toFixed(3));
+
+// ---------- colour scale for uncertainty ----------
+const HMAX = 2.0;                                   // nats; top of the colour scale
+const stops = [[0, [255, 255, 255]], [.2, [255, 238, 214]], [.55, [252, 186, 120]], [1, [233, 112, 52]]];
+function heat(h) {
+  const x = clamp(h / HMAX);
+  for (let k = 1; k < stops.length; k++) if (x <= stops[k][0]) {
+    const [a, ca] = stops[k - 1], [b, cb] = stops[k], u = (x - a) / (b - a);
+    return 'rgb(' + ca.map((c, i) => Math.round(c + u * (cb[i] - c))).join(',') + ')';
+  }
+  return 'rgb(233,112,52)';
+}
+const grad = document.getElementById('heat');
+stops.forEach(([o, c]) => el('stop', { offset: o, 'stop-color': `rgb(${c})` }, grad));
+
+// ---------- lay out the real tokens (measured, so it works in every browser) ----------
+const P = document.getElementById('passage'), O = document.getElementById('overlay');
+const FS = 21, LH = 46, X0 = 40, XMAX = 920, Y0 = 132;
+const meter = el('text', { 'font-size': FS, x: -9999, y: -9999 }, P);
+const width = s => { meter.textContent = s; return meter.getComputedTextLength(); };
+let x = X0, y = Y0;
+const toks = DATA.tokens.map((tk, i) => {
+  const w = width(tk.t), lead = tk.t.length - tk.t.trimStart().length, lw = lead ? width(tk.t.slice(0, lead)) : 0;
+  if (x + w > XMAX && i) { x = X0 - lw; y += LH; }
+  const g = el('g', {}, P);
+  const bg = el('rect', { x: x + lw - 1, y: y - FS + 1, width: Math.max(w - lw + 2, 4), height: FS + 9, rx: 4, fill: '#fff' }, g);
+  const tx = el('text', { x, y, 'font-size': FS, fill: C.ink }, g); tx.textContent = tk.t;
+  const strike = el('line', { x1: x + lw, x2: x + w, y1: y - 6, y2: y - 6, stroke: '#9aa0a6', 'stroke-width': 1.4, opacity: 0 }, g);
+  const o = { ...tk, i, g, bg, tx, strike, x0: x + lw, x1: x + w, y };
+  x += w;
+  return o;
+});
+meter.remove();
+const lastY = toks[toks.length - 1].y;
+
+// ---------- legend: uncertainty scale and the cutoff ----------
+const LG = el('g', {}, O), LX = 590, LW = 300, LY = lastY + 46;
+el('rect', { x: LX, y: LY, width: LW, height: 12, rx: 3, fill: 'url(#heat)', stroke: '#e0e2e5' }, LG);
+el('text', { x: LX, y: LY + 30, 'font-size': 12.5, fill: C.muted }, LG).textContent = 'student is sure';
+el('text', { x: LX + LW, y: LY + 30, 'font-size': 12.5, fill: C.muted, 'text-anchor': 'end' }, LG).textContent = 'student is unsure';
+el('text', { x: LX, y: LY - 8, 'font-size': 13, fill: C.ink, 'font-weight': 600 }, LG).textContent = 'Student’s uncertainty before each token';
+const CUT = el('g', {}, O), cx = LX + LW * DATA.cutoff / HMAX;
+el('line', { x1: cx, x2: cx, y1: LY - 4, y2: LY + 16, stroke: C.ink, 'stroke-width': 2 }, CUT);
+el('text', { x: cx + 6, y: LY + 48, 'font-size': 12.5, fill: C.ink }, CUT).textContent = '↑ cutoff: top half by uncertainty, corpus-wide';
+const MASKKEY = el('g', {}, O);
+el('rect', { x: 40, y: LY - 6, width: 34, height: 20, rx: 4, fill: 'url(#hatch)' }, MASKKEY);
+el('text', { x: 82, y: LY + 9, 'font-size': 13, fill: C.ink }, MASKKEY).textContent = 'read as context, but no training signal';
+
+// ---------- close-ups: the student's guesses at one sure and one unsure position ----------
+const INS = DATA.insets.slice().sort((a, b) => a.i - b.i).map((ins, k) => {
+  const tk = toks[ins.i], g = el('g', {}, O);
+  const bx = 40 + k * 240, by = LY + 6, bw = 220, bh = 160, n = String(k + 1);
+  const badge = (x, y, gg) => { el('circle', { cx: x, cy: y, r: 9, fill: C.ink }, gg);
+    el('text', { x, y: y + 4, 'font-size': 11.5, 'font-weight': 700, fill: '#fff', 'text-anchor': 'middle' }, gg).textContent = n; };
+  el('rect', { x: tk.x0 - 3, y: tk.y - FS - 1, width: tk.x1 - tk.x0 + 6, height: FS + 13, rx: 6, fill: 'none', stroke: C.ink, 'stroke-width': 1.6 }, g);
+  badge(tk.x0 - 2, tk.y - FS - 2, g);
+  el('rect', { x: bx, y: by, width: bw, height: bh, rx: 8, fill: '#fff', stroke: '#d6d9de' }, g);
+  badge(bx + 16, by + 18, g);
+  el('text', { x: bx + 32, y: by + 22, 'font-size': 12.5, 'font-weight': 600, fill: C.ink }, g).textContent = 'Student’s guesses';
+  el('text', { x: bx + 14, y: by + 42, 'font-size': 12, fill: C.muted }, g).textContent = `Entropy = ${tk.h.toFixed(2)} nats`;
+  ins.top.forEach(([w, p], j) => {
+    const yy = by + 66 + j * 20, chosen = w === tk.t.trim();
+    el('text', { x: bx + 14, y: yy + 4, 'font-size': 13, fill: w === '(space)' ? C.muted : C.ink, 'font-weight': chosen ? 700 : 400 }, g).textContent = w + (chosen ? ' ✓' : '');
+    el('rect', { x: bx + 76, y: yy - 7, width: Math.max(2, 96 * p), height: 12, rx: 2, fill: chosen ? '#e9a24f' : '#c9ced4' }, g);
+    el('text', { x: bx + 180, y: yy + 4, 'font-size': 12, fill: C.muted }, g).textContent = Math.round(p * 100) + '%';
+  });
+  return g;
+});
+// ---------- student, for the training pass ----------
+const ST = el('g', {}, O), SX = 760, SY = LY + 70;
+el('rect', { x: SX, y: SY, width: 160, height: 64, rx: 12, fill: C.student }, ST);
+el('text', { x: SX + 80, y: SY + 38, 'font-size': 17, 'font-weight': 600, 'text-anchor': 'middle', fill: C.ink }, ST).textContent = 'Student';
+const pulses = toks.map(tk => el('circle', { r: 4.5, fill: C.blue, opacity: 0 }, O));
+const cursor = el('rect', { height: 3, rx: 1.5, fill: C.ink, opacity: 0 }, O);
+
+const caption = (a, b) => { document.getElementById('caption1').textContent = a; document.getElementById('caption2').textContent = b || ''; };
+function setTokens(f) { toks.forEach(f); }
+function paintHeat(u) { setTokens(tk => tk.bg.setAttribute('fill', u > 0 ? heat(tk.h * clamp(u)) : '#fff')); }
+function mask(u) {
+  setTokens(tk => {
+    if (!tk.drop) { tk.tx.setAttribute('opacity', 1); tk.strike.setAttribute('opacity', 0); return; }
+    tk.bg.setAttribute('fill', u > .5 ? 'url(#hatch)' : heat(tk.h));
+    tk.tx.setAttribute('opacity', (1 - .55 * clamp(u)).toFixed(3)); tk.strike.setAttribute('opacity', (.8 * clamp(u)).toFixed(3));
+  });
+}
+const hideAll = () => { [LG, CUT, MASKKEY, ST, ...INS].forEach(n => fade(n, 0)); pulses.forEach(p => p.setAttribute('opacity', 0)); fade(cursor, 0);
+  setTokens(tk => { tk.tx.setAttribute('opacity', 1); tk.strike.setAttribute('opacity', 0); tk.bg.setAttribute('fill', '#fff'); tk.g.setAttribute('opacity', 1); }); };
+
+const STEPS = [
+  { name: 'Trace', title: 'A watermarked teacher trace', dur: 7,
+    cap: ['A real excerpt of the teacher’s reasoning, sampled with a watermark.', 'Nothing in the text gives the watermark away.'],
+    draw(t) { hideAll(); const n = Math.round(toks.length * ease(seg(t, .05, .85)));
+      toks.forEach((tk, i) => tk.g.setAttribute('opacity', i < n ? 1 : 0)); } },
+  { name: 'Uncertainty', title: 'How unsure is the student at each token?', dur: 9,
+    cap: ['Where the next token is obvious, a watermark has nothing to change. Where several continuations', 'are plausible (✓ marks what the teacher wrote), the key can tilt the choice: that is where the watermark lives.'],
+    draw(t) { hideAll(); paintHeat(ease(seg(t, .05, .4))); fade(LG, seg(t, .05, .2));
+      fade(INS[0], seg(t, .45, .55)); fade(INS[1], seg(t, .62, .72)); } },
+  { name: 'Mask', title: 'Drop the most uncertain half from the loss', dur: 7,
+    cap: ['Entropy laundering removes the most uncertain half of all training tokens from the loss.', 'They stay in the text, so the student still reads them as context.'],
+    draw(t) { hideAll(); paintHeat(1); fade(LG, 1); fade(CUT, seg(t, .05, .2)); mask(ease(seg(t, .3, .7))); fade(MASKKEY, seg(t, .6, .75)); } },
+  { name: 'Train', title: 'Train only on the confident tokens', dur: 9,
+    cap: ['The student reads every token but learns to predict only the confident ones: it picks up the teacher’s', 'reasoning while largely skipping the choices the key could have tilted.'],
+    draw(t) { hideAll(); paintHeat(1); mask(1); fade(LG, 1); fade(CUT, 1); fade(MASKKEY, 1); fade(ST, seg(t, 0, .1));
+      const u = seg(t, .1, .85) * toks.length, k = Math.min(Math.floor(u), toks.length - 1);
+      if (t > .1 && t < .87) { const tk = toks[k]; fade(cursor, 1); cursor.setAttribute('x', tk.x0); cursor.setAttribute('y', tk.y + 9); cursor.setAttribute('width', tk.x1 - tk.x0); }
+      toks.forEach((tk, i) => { const p = pulses[i];
+        if (tk.drop || u < i) { p.setAttribute('opacity', 0); return; }
+        const v = ease(clamp((u - i) / 2.2)), sx = (tk.x0 + tk.x1) / 2, sy = tk.y + 4;
+        p.setAttribute('cx', sx + v * (SX + 80 - sx)); p.setAttribute('cy', sy + v * (SY + 32 - sy));
+        p.setAttribute('opacity', v < 1 ? .85 : 0); });
+    } },
+];
+
+// ---------- player ----------
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const HOLD = 2.6;
+let step = 0, start = performance.now(), playing = !reduce, pausedT = reduce ? 1 : 0;
+const titleEl = document.getElementById('step-title'), playBtn = document.getElementById('play'), stepsEl = document.getElementById('steps');
+STEPS.forEach((st, i) => { const b = document.createElement('button'); b.textContent = (i + 1) + '. ' + st.name;
+  b.addEventListener('click', () => go(i, true)); stepsEl.appendChild(b); st.btn = b; });
+function show(i, t) {
+  STEPS.forEach((st, k) => st.btn.setAttribute('aria-current', k === i ? 'step' : 'false'));
+  titleEl.textContent = STEPS[i].title; caption(...STEPS[i].cap); STEPS[i].draw(clamp(t));
+}
+function go(i, user) { step = (i + STEPS.length) % STEPS.length; start = performance.now();
+  pausedT = (user && !playing) || reduce ? 1 : 0; show(step, playing ? 0 : pausedT); }
+function setPlaying(p) { playing = p; playBtn.textContent = p ? '❚❚ Pause' : '▶ Play'; playBtn.setAttribute('aria-label', p ? 'Pause' : 'Play');
+  if (p) start = performance.now() - pausedT * STEPS[step].dur * 1000; }
+playBtn.addEventListener('click', () => {
+  if (playing) { pausedT = clamp((performance.now() - start) / (STEPS[step].dur * 1000)); setPlaying(false); }
+  else { if (pausedT >= 1) go(step + 1); pausedT = pausedT >= 1 ? 0 : pausedT; setPlaying(true); } });
+document.getElementById('prev').addEventListener('click', () => go(step - 1, true));
+document.getElementById('next').addEventListener('click', () => go(step + 1, true));
+function frame(now) { if (playing) { const e = (now - start) / 1000, d = STEPS[step].dur; show(step, e / d); if (e > d + HOLD) go(step + 1); }
+  requestAnimationFrame(frame); }
+setPlaying(playing); show(0, pausedT); requestAnimationFrame(frame);
+window.__show = (i, t) => { playing = false; step = i; show(i, t); };
+// Tell the embedding page how tall this animation is, so its iframe never clips the controls.
+function postHeight() { try { parent.postMessage({ type: 'anim-height', h: document.documentElement.scrollHeight }, '*'); } catch (e) {} }
+addEventListener('load', postHeight); addEventListener('resize', postHeight); setTimeout(postHeight, 300);
+</script>
+</body>
+</html>
