@@ -207,7 +207,7 @@ const STEPS = [];
   });
 })();
 
-// ---------- Step 4: nudge theta_c toward theta_w (schematic) ----------
+// ---------- Step 4: nudge theta_c toward theta_w (left panel schematic, curves real) ----------
 (() => {
   const g = el('g', {}, scenes), s = {};
   box(g, 40, 80, 330, 372, '#fbfbfc', '#d6d9de').setAttribute('stroke-dasharray', '5 5');
@@ -228,8 +228,7 @@ const STEPS = [];
   el('line', { x1: X0, y1: YZ, x2: X1, y2: YZ, stroke: C.line, 'stroke-width': 1, 'stroke-dasharray': '3 4' }, g);
   label(g, X0, Y0 + 22, [['ε', 'it'], [' = 0  ('], ['θ', 'it'], ['c', 'sub'], [')']], { 'font-size': 14, 'text-anchor': 'middle', fill: '#555' });
   label(g, X1, Y0 + 22, [['ε', 'it'], [' = 1  ('], ['θ', 'it'], ['w', 'sub'], [')']], { 'font-size': 14, 'text-anchor': 'middle', fill: C.blue });
-  label(g, X0 - 14, YT - 18, [['how likely the answer is']], { 'font-size': 13, fill: C.muted });
-  label(g, X1 - 2, YT - 18, [['curves computed by the detector trained on '], ['D', 'it'], ['w', 'sub']], { 'font-size': 12, fill: C.muted, 'text-anchor': 'end' });
+  label(g, X0 - 14, YT - 18, [['how likely the answer is (NOT schematic!)']], { 'font-size': 13, fill: C.muted });
   const xs = e => X0 + e * (X1 - X0);
   // Real curves: change in mean per-token log p(y|x) relative to eps = 0, at eps = 0, 0.1, ..., 1 (Catmull-Rom between points).
   const E = DATA.eps, ys = v => YZ - v * 3400;                            // 0.01 nats/token = 34 px
@@ -252,7 +251,7 @@ const STEPS = [];
   Object.assign(s, { pathFor, fw, fc });
   STEPS.push({
     name: 'Nudge', title: 'Nudge the clean teacher toward the watermarked one', dur: 8, g,
-    caption: 'Slide from <i>θ</i><sub>c</sub> toward <i>θ</i><sub>w</sub> and watch how likely each CO⁺ answer becomes. The distilled student’s answer gains; the clean student’s loses.',
+    caption: 'Slide from <i>θ</i><sub>c</sub> toward <i>θ</i><sub>w</sub> and watch how likely each CO⁺ answer becomes. The distilled student’s answer gains; the clean student’s loses. The curves on the right are real, computed from the two actual answers.',
     draw(t) {
       const u = ease(seg(t, .08, .78));
       s.dot.setAttribute('cx', s.PC[0] + u * (s.PW[0] - s.PC[0])); s.dot.setAttribute('cy', s.PC[1] + u * (s.PW[1] - s.PC[1]));
