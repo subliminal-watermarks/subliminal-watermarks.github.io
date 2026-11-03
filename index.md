@@ -46,7 +46,7 @@ On the other hand, the distillers are smart too. They understand how LLM waterma
 
 Both laundering schemes are capable of breaking all existing watermark/fingerprint techniques that we tried, including Gumbel-Max ([Aaronson, 2022](#ref-aaronson2022)), SynthID ([Dathathri et al., 2024](#ref-dathathri2024)), TextSeal ([Sander et al., 2026](#ref-sander2026)), and ADFP ([Xu et al., 2026](#ref-xu2026)). These are strong attacks!
 
-Of course, Subliminal-Watermark remains effective after both laundering schemes 😁
+Of course, Subliminal-Watermark remains effective after both laundering schemes!
 
 ## 2. Background {#background}
 
