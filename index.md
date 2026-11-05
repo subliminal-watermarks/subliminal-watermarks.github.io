@@ -5,14 +5,19 @@ affiliation: UC Berkeley
 # `equal: true` shows the * marker; `equal_note` is the text after the * under the author list.
 authors:
   - name: Gautham Govind Anil
+    url: https://gautham-ga.github.io/
     equal: true
   - name: Arnav Santosh Chavan
+    url: https://arnav0400.github.io/
     equal: true
   - name: Chang-Han Chen
+    url: https://chang-han-chen.github.io/
     equal: true
   - name: Harshit Varma
+    url: https://hrshtv.github.io/
     equal: true
   - name: Sewon Min
+    url: https://www.sewonmin.com/
 equal_note: "Equal contribution, listed in alphabetical order"
 excerpt: "Robust watermark signals live in the parameter space and not the text, and will pass on to the distillers subliminally, even if they try to 'launder'. More precisely, given a response, our detector asks if its log-likelihood increases along a learned parameter-space direction." 
 ---
@@ -23,6 +28,13 @@ excerpt: "Robust watermark signals live in the parameter space and not the text,
 Are the current watermarking schemes robust against distillation attacks? We first introduce two simple techniques that beat all anti-distillation watermark detectors we tested: **grandchild** and **entropy laundering**. Inspired by subliminal learning, we suspect that the watermark signal may generalize better in **parameter space**, and introduce **Subliminal Watermark (SubWM)**, a new detection scheme that can identify distillation from a few sampled rollouts of a suspect model and remains effective after the laundering schemes. It measures "how much does the likelihood of this sequence increase if we shift our probe model's weights toward a watermarked one?" 
 
 On science questions, SubWM achieves about **99%** true positive rate (TPR) and **3%** false positive rate (FPR) per **single** query to the suspect. This also means that a simple majority vote over, say, 10 sampled rollouts is projected to detect distillation almost perfectly. On **long-horizon** coding tasks, the detection is more difficult, likely because code tokens have lower entropy, but SubWM still achieves above **65%** TPR at **5%** FPR. A majority vote over only 50 sampled rollouts again is projected to achieve almost perfect detection. To avoid data leakage, both the evaluation and threshold tuning are done on **held-out** prompts that neither SubWM nor the suspect has ever seen.
+</div>
+
+<div class="margin-toc" markdown="1">
+<p class="margin-toc-title">Contents</p>
+
+* TOC
+{:toc}
 </div>
 
 <figure class="anim-embed">

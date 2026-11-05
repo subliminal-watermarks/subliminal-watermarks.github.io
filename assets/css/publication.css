@@ -165,3 +165,16 @@ mjx-container[display="true"] { min-width: 0 !important; }
 /* Embedded step-through animations (assets/anim/*.html). On phones they keep a legible minimum width and scroll sideways. */
 .anim-embed { margin: 28px 0 32px; overflow-x: auto; }
 .anim-embed iframe { display: block; width: 100%; min-width: 640px; aspect-ratio: 960 / 600; border: 0; }
+
+/* Table of contents. Wide screens: in the right margin, level with the top of the post. Otherwise: a box below the TL;DR. */
+.post-body { position: relative; }
+.margin-toc { margin: 0 0 36px; padding: 16px 20px; background: var(--soft); border-radius: 4px; font-size: 14px; line-height: 1.45; }
+.post-body .margin-toc-title { margin: 0 0 8px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.post-body .margin-toc ul { list-style: none; margin: 0; padding-left: 0; }
+.post-body .margin-toc ul ul { margin: 0; padding-left: .9rem; }
+.post-body .margin-toc li { margin: 3px 0; }
+.margin-toc a { color: var(--text); }
+.margin-toc a:hover { color: var(--link); }
+@media (min-width: 1460px) {
+  .margin-toc { position: absolute; top: 0; left: calc(100% + 1.5rem); width: 13rem; margin: 0; }
+}
