@@ -92,7 +92,7 @@ function generate(key) {
   return steps;
 }
 
-// ---------- suggested keys: four keys whose continuations start differently ----------
+// ---------- suggested keys: keys whose continuations start differently; the demo offers two of them ----------
 function pickSuggested() {           // per first token, the most fluent of the first keys found (highest path probability)
   const byFirst = new Map();
   for (let i = 1; i < 4000; i++) {
@@ -143,8 +143,8 @@ function useKey(key, btn) {
   steps = generate(key); renderText(); renderDetail();
 }
 
-const suggested = pickSuggested(), holder = document.getElementById('suggested');
-suggested.forEach((k, i) => { const b = document.createElement('button'); b.textContent = 'Key ' + 'ABCD'[i];
+const suggested = pickSuggested().slice(2, 4), holder = document.getElementById('suggested');   // the 3rd and 4th: the key overrides the model's top choice more often
+suggested.forEach((k, i) => { const b = document.createElement('button'); b.textContent = 'Key ' + 'AB'[i];
   b.onclick = () => useKey(k, b); holder.appendChild(b); });
 document.getElementById('random').onclick = e => useKey((Math.random() * 4294967296) >>> 0, e.currentTarget);
 

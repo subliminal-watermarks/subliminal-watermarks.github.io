@@ -22,16 +22,13 @@ excerpt: "Robust watermark signals live in the parameter space and not the text,
 
 Are the current watermarking schemes robust against distillation attacks? We first introduce two simple techniques that beat all anti-distillation watermark detectors we tested: **grandchild** and **entropy laundering**. Inspired by subliminal learning, we suspect that the watermark signal may generalize better in **parameter space**, and introduce **Subliminal Watermark (SubWM)**, a new detection scheme that can identify distillation from a few sampled rollouts of a suspect model and remains effective after the laundering schemes. It measures "how much does the likelihood of this sequence increase if we shift our probe model's weights toward a watermarked one?" 
 
-On science questions, SubWM achieves about **99%** true positive rate (TPR) and **3%** false positive rate (FPR) per **single** query to the suspect. This also means that a simple majority vote over, say, 10 sampled rollouts is projected to detect distillation almost perfectly. On coding tasks, the detection is more difficult, likely because code tokens have lower entropy, but SubWM still achieves above **65%** TPR at **5%** FPR. A majority vote over only 50 sampled rollouts again is projected to achieve almost perfect detection.
+On science questions, SubWM achieves about **99%** true positive rate (TPR) and **3%** false positive rate (FPR) per **single** query to the suspect. This also means that a simple majority vote over, say, 10 sampled rollouts is projected to detect distillation almost perfectly. On **long-horizon** coding tasks, the detection is more difficult, likely because code tokens have lower entropy, but SubWM still achieves above **65%** TPR at **5%** FPR. A majority vote over only 50 sampled rollouts again is projected to achieve almost perfect detection. To avoid data leakage, both the evaluation and threshold tuning are done on **held-out** prompts that neither SubWM nor the suspect has ever seen.
 </div>
 
 <figure class="anim-embed">
-<iframe src="{{ '/assets/anim/likelihood-line.html' | relative_url }}" title="Animation: the SubWM score as a likelihood change along one line in weight space. One watermarked answer's log-likelihood is traced along the line from the clean teacher copy to the watermarked one; its slope at the clean copy is the score. Then 80 real held-out answers, and the histogram of all 1,600 scores." loading="lazy"></iframe>
+<iframe src="{{ '/assets/anim/likelihood-line.html' | relative_url }}" title="Animation: how SubWM scores a response. The log-likelihood of a watermarked and a clean student's answer to the same science question is traced from the clean teacher copy to the watermarked one; each score is the rise at the watermarked copy, read against a fixed threshold. Then 80 real held-out answers, and the histogram of all 1,600 scores." loading="lazy"></iframe>
 </figure>
 
-<figure class="anim-embed">
-<iframe src="{{ '/assets/anim/stream.html' | relative_url }}" title="Animation: answers from a watermarked student and a clean student go through SubWM one at a time. Three real pairs are shown readable, then all 800 + 800 answers stream into 'says watermarked' and 'says clean'." loading="lazy"></iframe>
-</figure>
 
 ## 1. What are LLM watermarks? {#watermark}
 
@@ -48,11 +45,11 @@ The best example of a watermark is Aaronson's ([2022](#ref-aaronson2022)) Gumbel
 
 More concretely, we prepare an $$n$$-gram hash table: at each step, the previous $$n$$ tokens and a secret key $$k$$ are hashed into a seed, and the seed generates one pseudorandom number $$u_v \in (0,1)$$ for every token $$v$$ in the vocabulary. Given the model's next-token probabilities $$p_v$$, we return $$\arg\max_v u_v^{1/p_v}$$, the standard Gumbel-Max trick. Because the seed depends only on the preceding $$n$$ tokens and the key, one can recompute every $$u_v$$ afterwards with the key. 
 
-If you are not familiar with this, don't worry. Click on the random key below, and see how it changes the model's output. You can also click on the blue tokens to see $$p_v$$ and $$u_v$$ explicitly.
+If you are not familiar with this, click on the keys below and see how it changes the model's output. You can also click on the blue tokens to see $$p_v$$ and $$u_v$$ explicitly.
 <div class="anim-embed">
 <iframe src="{{ '/assets/anim/gumbel.html' | relative_url }}" title="Interactive: how a secret key picks the next token in a Gumbel-Max watermark" loading="lazy"></iframe>
 </div>
-To anyone without the key, $$u$$ looks uniformly random, so each token is still chosen with probability $$p_v$$.
+The point is, to anyone without the key, $$u$$ looks uniformly random, so each token is still chosen with probability $$p_v$$.
 
 
 The detection in the original work computes the _textual_ correlation between sampled tokens $$y_t$$ and the pseudorandom numbers $$u_{y_t}$$ by $$ S(y) \;=\; \sum_{t=1}^{T} -\ln\big(1 - u^{(t)}_{y_t}\big).$$ Again, the number $$u_{y_t}$$ can be recomputed from the key $$k$$ and the preceding $$n$$ tokens. 
@@ -85,9 +82,9 @@ Closed-detector training-trace p-values only; clean training p-value and accurac
 
 **Entropy laundering.** Drop the top 50% highest-entropy tokens from the SFT loss, while keeping them in the context. Of course, the distiller won't have the teacher's logits, so they have to use some proxy model's entropy, e.g., their own model's. 
 
-See the illustration below based on a real example:
+See the illustration below based on a real Qwen3.5-4B's response on a science question:
 <div class="anim-embed">
-<iframe src="{{ '/assets/anim/entropy.html' | relative_url }}" title="Animation: entropy laundering on a real watermarked trace" loading="lazy"></iframe>
+<iframe src="{{ '/assets/anim/entropy.html' | relative_url }}" title="Figure: entropy laundering on a real watermarked trace. The student's uncertainty before each token, and the most uncertain half of the tokens dropped from the loss." loading="lazy"></iframe>
 </div>
 
 
@@ -129,12 +126,7 @@ In words:
 *How much more likely is the response if we shift the clean teacher toward the watermarked one in parameter space?*
 {: .key-idea}
 
-Below is a real example of a science question and a pair of responses from the clean and watermarked students. As one can see on Slide 4, the likelihoods of the two traces drift apart as we shift the detector's weights toward the watermarked one. Slide 5 shows the scores for the other 399 science questions too, with a threshold calibrated on a held-out set.
-<div class="anim-embed">
-<iframe src="{{ '/assets/anim/detector.html' | relative_url }}" title="Animation: how the parameter-space detector works" loading="lazy"></iframe>
-</div>
-
-**Crucially**, the score can be computed very efficiently via autodiff. We just need one forward pass through the slightly perturbed weights $$\theta_c + \epsilon\Delta\theta$$ and then a backward pass to the scalar $$\epsilon$$. The gradients are _never materialized_. For those who like math, this is because our score is _not_ the cosine similarity between two gradients or two parameter-space directions, but the canonical pairing between one of each (or between the tangent space and the cotangent space if you wish). This is why we don't need to, e.g., normalize the gradients and $$\Delta\theta$$ in principle, or approximate the Hessian of the loss landscape.
+Crucially, the score can be computed very efficiently via **autodiff**. We just need one forward pass through the slightly perturbed weights $$\theta_c + \epsilon\Delta\theta$$ and then a backward pass to the scalar $$\epsilon$$. The gradients are _never materialized_. For those who like math, this is because our score is _not_ the cosine similarity between two gradients or two parameter-space directions, but the canonical pairing between one of each (or between the tangent space and the cotangent space if you wish). This is why we don't need to, e.g., normalize the gradients and $$\Delta\theta$$ in principle, or approximate the Hessian of the loss landscape.
 
 In fact, even without backprop, the finite-difference approximation already works well:
 
@@ -147,15 +139,17 @@ $$
 which is just the **mean log-likelihood ratio** (LLR) between the teacher checkpoints. Despite its strong performance in practice, this simple score is less interpretable in terms of linear parameter-space directions. We report both scores in the following.
 
 
-
 ### 3.2 SubWM has great TPR and FPR on single responses, and even out of distribution
 
-On science questions, this is just to reiterate the result on Slide 5 above:
-<figure>
-  <img src="{{ '/assets/images/dw-prime-detection.png' | relative_url }}" alt="Alignment score s1 for the key-1 and clean students on 800 held-out prompts, using detector teachers fitted on fresh training prompts">
+All students in this post run in **thinking mode**, so SubWM scores the model's full chain of thought (many existing anti-distillation methods work poorly on long contexts). In particular, for agentic coding, each action is generated with up to about 29k tokens of the trajectory in context.
+
+On science questions, this is just to reiterate the results shown at the beginning:
+<figure class="anim-embed">
+<iframe src="{{ '/assets/anim/likelihood-line.html' | relative_url }}?final" title="Figure: real likelihood curves of held-out science answers from the clean teacher copy to the watermarked one (80 shown), and the histogram of all 1,600 scores (800 per student) against the fixed threshold. Flagged: 800 of 800 watermarked answers, 22 of 800 clean ones." loading="lazy"></iframe>
 </figure>
 
-SubWM flags all 800 watermarked answers at a 2.5% FPR. For all numbers, including the ones on other random keys, see the [result tables](#result-tables).
+
+SubWM flags all 800 watermarked answers at a 2.75% FPR. For all numbers, including the ones on other random keys, see the [result tables](#result-tables).
 
 This detector, trained on science questions, works for other domains too, including math (GSM8K) and coding (LiveCodeBench). We ask the same science-distilled students new questions from these domains and score their answers with the same detector, recalibrating only the threshold on clean teacher answers from the new domain. On math, the LLR score flags **99.3%** of watermarked answers at a **5.9%** FPR; on coding questions, **89.4%** at **5.8%** (see the [out-of-distribution table](#ood-results)).
 
