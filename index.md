@@ -26,6 +26,10 @@ On science questions, SubWM achieves about **99%** true positive rate (TPR) and 
 </div>
 
 <figure class="anim-embed">
+<iframe src="{{ '/assets/anim/likelihood-line.html' | relative_url }}" title="Animation: the SubWM score as a likelihood change along one line in weight space. One watermarked answer's log-likelihood is traced along the line from the clean teacher copy to the watermarked one; its slope at the clean copy is the score. Then 80 real held-out answers, and the histogram of all 1,600 scores." loading="lazy"></iframe>
+</figure>
+
+<figure class="anim-embed">
 <iframe src="{{ '/assets/anim/stream.html' | relative_url }}" title="Animation: answers from a watermarked student and a clean student go through SubWM one at a time. Three real pairs are shown readable, then all 800 + 800 answers stream into 'says watermarked' and 'says clean'." loading="lazy"></iframe>
 </figure>
 
