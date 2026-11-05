@@ -134,7 +134,7 @@ const STEPS = [];
   label(st, 560, 452, [['× 9,000 prompts each']], { 'text-anchor': 'middle', fill: C.muted, 'font-size': 13 });
   s.stacks = st;
   STEPS.push({
-    name: 'Two answers', title: 'The teacher answers each prompt twice', dur: 10, g,
+    name: 'Two answers', title: 'The teacher answers each prompt twice', dur: 7.5, g,
     caption: 'One answer is sampled normally, one with the watermark. They read alike: the watermark only tilts which token gets picked where the model is unsure.',
     draw(t) {
       s.arrows.forEach(p => draw(p, ease(seg(t, .04, .18))));
@@ -172,7 +172,7 @@ const STEPS = [];
     s.boxes.push(bg);
   });
   STEPS.push({
-    name: 'Fine-tune', title: 'Fine-tune two copies of the teacher', dur: 7, g,
+    name: 'Fine-tune', title: 'Fine-tune two copies of the teacher', dur: 5.5, g,
     caption: 'Same starting point, same settings, different data. The small difference Δ<i>θ</i> between the two copies points in the watermark’s direction.',
     draw(t) {
       draw(s.pc, ease(seg(t, .05, .6))); draw(s.pw, ease(seg(t, .05, .6)));
@@ -198,7 +198,7 @@ const STEPS = [];
   s.q = el('g', {}, g);
   label(s.q, 480, 404, [['Which answer came from the distilled student?']], { 'text-anchor': 'middle', 'font-size': 18, 'font-weight': 600 });
   STEPS.push({
-    name: 'Suspect answers', title: 'Two students answer a new question', dur: 8, g,
+    name: 'Suspect answers', title: 'Two students answer a new question', dur: 6, g,
     caption: 'Both students learned from the same teacher, but only one from its watermarked answers. Their answers to a new prompt look just as alike.',
     draw(t) {
       s.cards.forEach((c, i) => { fade(c.cg, seg(t, .03 + .05 * i, .12 + .05 * i)); typeInto(c.txt, c.text, seg(t, .12, .8)); });
@@ -250,7 +250,7 @@ const STEPS = [];
   label(s.tan, xs(.02), YZ + slope * .42 - 28, [['slope at '], ['ε', 'it'], [' = 0 is the score']], { 'font-size': 14.5, 'font-weight': 600 });
   Object.assign(s, { pathFor, fw, fc });
   STEPS.push({
-    name: 'Nudge', title: 'Nudge the clean teacher toward the watermarked one', dur: 8, g,
+    name: 'Nudge', title: 'Nudge the clean teacher toward the watermarked one', dur: 6, g,
     caption: 'Slide from <i>θ</i><sub>c</sub> toward <i>θ</i><sub>w</sub> and watch how likely each CO⁺ answer becomes. The distilled student’s answer gains; the clean student’s loses. The curves on the right are real, computed from the two actual answers.',
     draw(t) {
       const u = ease(seg(t, .08, .78));
@@ -295,7 +295,7 @@ const STEPS = [];
   s.cw = label(g, 800, rows.watermarked + 6, [['']], { 'font-size': 15, fill: C.blue, 'font-weight': 600 });
   s.cc = label(g, 800, rows.clean + 6, [['']], { 'font-size': 15, fill: '#666', 'font-weight': 600 });
   STEPS.push({
-    name: 'All answers', title: 'Score every held-out answer', dur: 9, g,
+    name: 'All answers', title: 'Score every held-out answer', dur: 7, g,
     caption: `One dot per answer to 800 held-out prompts. Every answer from the distilled student lands right of the cutoff; ${DATA.flagged.clean} of 800 clean answers do.`,
     draw(t) {
       fade(s.ex, seg(t, 0, .1));
@@ -317,7 +317,7 @@ const STEPS = [];
 
 // ---------- player ----------
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const HOLD = 2.6;
+const HOLD = 2.0;
 let step = 0, start = performance.now(), playing = !reduce, pausedT = reduce ? 1 : 0;
 const titleEl = document.getElementById('step-title'), capEl = document.getElementById('caption');
 const playBtn = document.getElementById('play'), stepsEl = document.getElementById('steps');

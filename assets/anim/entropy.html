@@ -150,18 +150,18 @@ const hideAll = () => { [LG, CUT, MASKKEY, ST, ...INS].forEach(n => fade(n, 0));
   setTokens(tk => { tk.tx.setAttribute('opacity', 1); tk.strike.setAttribute('opacity', 0); tk.bg.setAttribute('fill', '#fff'); tk.g.setAttribute('opacity', 1); }); };
 
 const STEPS = [
-  { name: 'Trace', title: 'A watermarked teacher trace', dur: 7,
+  { name: 'Trace', title: 'A watermarked teacher trace', dur: 5.5,
     cap: ['A real excerpt of the teacher’s reasoning, sampled with a watermark.', 'Nothing in the text gives the watermark away.'],
     draw(t) { hideAll(); const n = Math.round(toks.length * ease(seg(t, .05, .85)));
       toks.forEach((tk, i) => tk.g.setAttribute('opacity', i < n ? 1 : 0)); } },
-  { name: 'Uncertainty', title: 'How unsure is the student at each token?', dur: 9,
+  { name: 'Uncertainty', title: 'How unsure is the student at each token?', dur: 7,
     cap: ['Where the next token is obvious, a watermark has nothing to change. Where several continuations', 'are plausible (✓ marks what the teacher wrote), the key can tilt the choice: that is where the watermark lives.'],
     draw(t) { hideAll(); paintHeat(ease(seg(t, .05, .4))); fade(LG, seg(t, .05, .2));
-      fade(INS[0], seg(t, .45, .55)); fade(INS[1], seg(t, .62, .72)); } },
-  { name: 'Mask', title: 'Drop the most uncertain half from the loss', dur: 7,
+      fade(INS[0], seg(t, .45, .58)); fade(INS[1], seg(t, .45, .58)); } },
+  { name: 'Mask', title: 'Drop the most uncertain half from the loss', dur: 5.5,
     cap: ['Entropy laundering removes the most uncertain half of all training tokens from the loss.', 'They stay in the text, so the student still reads them as context.'],
     draw(t) { hideAll(); paintHeat(1); fade(LG, 1); fade(CUT, seg(t, .05, .2)); mask(ease(seg(t, .3, .7))); fade(MASKKEY, seg(t, .6, .75)); } },
-  { name: 'Train', title: 'Train only on the confident tokens', dur: 9,
+  { name: 'Train', title: 'Train only on the confident tokens', dur: 7,
     cap: ['The student reads every token but learns to predict only the confident ones: it picks up the teacher’s', 'reasoning while largely skipping the choices the key could have tilted.'],
     draw(t) { hideAll(); paintHeat(1); mask(1); fade(LG, 1); fade(CUT, 1); fade(MASKKEY, 1); fade(ST, seg(t, 0, .1));
       const u = seg(t, .1, .85) * toks.length, k = Math.min(Math.floor(u), toks.length - 1);
@@ -176,7 +176,7 @@ const STEPS = [
 
 // ---------- player ----------
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const HOLD = 2.6;
+const HOLD = 2.0;
 let step = 0, start = performance.now(), playing = !reduce, pausedT = reduce ? 1 : 0;
 const titleEl = document.getElementById('step-title'), playBtn = document.getElementById('play'), stepsEl = document.getElementById('steps');
 STEPS.forEach((st, i) => { const b = document.createElement('button'); b.textContent = (i + 1) + '. ' + st.name;
