@@ -1,14 +1,13 @@
 # Project page / blog post
 
-The blog post lives in `index.md`. This folder is a small Jekyll site (Markdown + MathJax),
-built and served by GitHub Pages; nothing here affects the code in the rest of the repo.
+The blog post lives in `index.md`. This repository is a small Jekyll site (Markdown + MathJax), built and
+served by GitHub Pages as the organisation site. The code lives in the private `fingerprint-sft` repository.
 
 ## Preview locally
 
 ```bash
-cd docs
 bundle install                 # once
-bundle exec jekyll serve       # then open http://localhost:4000/fingerprint-sft/
+bundle exec jekyll serve       # then open http://localhost:4000/
 ```
 
 ## Writing
@@ -26,7 +25,6 @@ bundle exec jekyll serve       # then open http://localhost:4000/fingerprint-sft
 
 1. Settle: method name/title, author order, equal-contribution marks, Sewon.
 2. Remove every TODO box and `draft: true`; set `date:`.
-3. The repo must be public for the page to be public: scan the git history for secrets
-   (API keys, HF/W&B tokens) first.
-4. Repo Settings -> Pages -> Deploy from a branch -> `main`, folder `/docs`.
-   The site appears at https://subliminal-watermarks.github.io/fingerprint-sft/
+3. This repo must stay public for the page to be public (the org is on the free plan); it holds only the site.
+4. Repo Settings -> Pages -> Deploy from a branch -> `main`, folder `/` (root).
+   The site appears at https://subliminal-watermarks.github.io/

@@ -1,12 +1,11 @@
-# Project page for the watermark-distillation project.
-# Served by GitHub Pages from the /docs folder of subliminal-watermarks/fingerprint-sft
-# (Settings -> Pages -> Deploy from a branch -> main, /docs).
+# Project page for Subliminal Watermarks. The org site: served by GitHub Pages from the root of
+# subliminal-watermarks/subliminal-watermarks.github.io (Settings -> Pages -> Deploy from a branch -> main, /).
 
 title: "[Method name TBD]"
 description: "Detecting watermark distillation from a single student response."
 url: "https://subliminal-watermarks.github.io"
-baseurl: "/fingerprint-sft"   # must match the repo name; change if the site moves
-repo_url: "https://github.com/subliminal-watermarks/fingerprint-sft"
+baseurl: ""   # org site, served at the domain root
+repo_url: "https://github.com/subliminal-watermarks/subliminal-watermarks.github.io"
 
 # Build settings (same stack as chang-han-chen.github.io)
 markdown: kramdown
