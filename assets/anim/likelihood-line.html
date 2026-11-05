@@ -48,6 +48,25 @@ svg.tex { display: inline-block; fill: currentColor; stroke: currentColor; overf
 .card .a { margin: 0; padding-left: 1cqw; border-left: .28cqw solid var(--grey); max-height: 15cqw; overflow: hidden; -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
 .card .a.wm { border-color: var(--blue); }
 .card .a.snip { -webkit-mask-image: none; mask-image: none; font-style: italic; }
+@media (max-width: 600px) {
+  .wrap { padding: 4px 0 6px; gap: 8px; }
+  .stage { aspect-ratio: auto; height: 410px; }
+  .stage.is-static { height: 300px; }
+  .tag { font-size: 12px; }
+  .tag.mu, .tag .n { font-size: 11px; }
+  .tag.training { max-width: 44%; white-space: normal; text-align: center; transform: translate(-50%, -50%); font-size: 11px; }
+  .tag.score { transform: translate(-100%, -50%); }
+  .counts { font-size: 11px; line-height: 1.6; min-height: 36px; }
+  .counts b { display: inline-block; }
+  .overlay { padding: 8px 12px 10px; }
+  .card { left: 12px; top: 244px; width: calc(100% - 24px); max-height: 154px; padding: 9px 11px; border-radius: 7px; font-size: 13px; overflow: hidden; }
+  .card .src { margin: 0 0 6px; padding-bottom: 4px; font-size: 11px; }
+  .card .hd { font-size: 10px; margin-bottom: 3px; }
+  .card .q { margin-bottom: 7px; max-height: 38px; overflow: hidden; }
+  .card .a { max-height: 56px; padding-left: 8px; border-left-width: 2px; }
+  .ctl { margin-top: 0; }
+  .replay { min-height: 44px; }
+}
 </style>
 </head>
 <body>
@@ -96,12 +115,14 @@ const T5 = PH[5] + 1.2, SLOW_GAP = 1.1, FAST = 2.6 / Math.max(1, REST.length - S
 const startOf = k => k < SLOW.length ? T5 + k * SLOW_GAP : T5 + SLOW.length * SLOW_GAP + (k - SLOW.length) * FAST;
 const durOf = k => k < SLOW.length ? 0.9 : 0.5, SLOW_END = T5 + SLOW.length * SLOW_GAP;
 let paused = false, t0 = performance.now(), pausedAt = 0, T = 0, phase = 0;
-const SPEED = 1.875;   // playback rate: the timeline above is in story seconds
+const SPEED = 1.6875;   // playback rate: 90% of the previous speed; timeline in story seconds
 
 /* ---- stage geometry: x = eps (0 = theta_c, 1 = theta_w), y = change in log p per token ---- */
 const canvas = $('cv'), stage = $('stage'), ctx = canvas.getContext('2d'), card = $('card');
 // ?final shows a still of the last frame (all curves and the histogram of all scores), without controls
 const STATIC = /(^|&)final(=|&|$)/.test(location.search.slice(1));
+const narrow = matchMedia('(max-width: 600px)');
+stage.classList.toggle('is-static', STATIC);
 if (STATIC) { document.querySelector('.bar').style.display = 'none'; document.querySelector('.ctl').style.display = 'none'; stage.style.cursor = 'default'; }
 let W = 0, H = 0, dpr = 1;
 function resize() { dpr = Math.min(window.devicePixelRatio || 1, 2); W = stage.clientWidth; H = stage.clientHeight; canvas.width = W * dpr; canvas.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
@@ -109,7 +130,9 @@ new ResizeObserver(resize).observe(stage); resize();
 let XMIN = -0.42, XMAX = 1.22, YLO = -0.04, YHI = 0.04, CU = 0, B = null;   // updated every frame
 // y range: zoomed in on the two single answers, wider for all curves, widest for the histogram of all scores
 const R = [[-0.04, 0.04], [-0.072, 0.05], [-0.096, 0.072]];
-const box = () => ({ left: W * (0.07 + 0.32 * CU), right: W * 0.93, top: H * 0.1, bottom: H * 0.82 });
+const box = () => narrow.matches
+  ? { left: W * 0.13, right: W * 0.9, top: 38, bottom: STATIC ? H - 62 : lerp(H - 62, 212, CU) }
+  : { left: W * (0.07 + 0.32 * CU), right: W * 0.93, top: H * 0.1, bottom: H * 0.82 };
 const sx = e => B.left + (e - XMIN) / (XMAX - XMIN) * (B.right - B.left);
 const sy = v => B.bottom - (v - YLO) / (YHI - YLO) * (B.bottom - B.top);
 // smooth curve through the measured points (Catmull-Rom on the uniform eps grid)
@@ -134,13 +157,13 @@ const XA = 1.1;   // the x axis (theta) runs from theta_c to just past theta_w
 tag(texC, 'g', () => [sx(0), lerp(sy(0) + W * 0.024, B.bottom + W * 0.02, axesU())], 0, 0, () => T > 3.6);
 tag(texW, 'b', () => [sx(1), lerp(sy(0) + W * 0.024, B.bottom + W * 0.02, axesU())], 0, 0, () => T > 3.6);
 tag(`${tex0}&nbsp; the teacher`, 'ink', () => P0(), 0, -22, () => T > 0.6 && phase < 1);
-tag('fine-tune on<br><b>clean</b> outputs', 'g right', () => midC(), -16, 0, () => phase === 0 && T > 2.0);
-tag('fine-tune on <b>watermarked</b> outputs', 'b left', () => midK(), 6, -16, () => phase === 0 && T > 1.2);
+tag('fine-tune on<br><b>clean</b> outputs', 'g right training', () => narrow.matches ? [sx(0), sy(0) + 30] : midC(), () => narrow.matches ? 0 : -16, 0, () => phase === 0 && T > 2.0);
+tag('fine-tune on <b>watermarked</b> outputs', 'b left training', () => narrow.matches ? [sx(1), sy(0) + 30] : midK(), () => narrow.matches ? 0 : 6, () => narrow.matches ? 0 : -16, () => phase === 0 && T > 1.2);
 tag(texD, 'p', () => [sx(0.5), sy(0)], 0, -18, () => T > 5.0 && phase < 2);
 tag(`${texLogp} on student’s response`, 'mu left', () => [sx(0), B.top], 10, 4, () => phase >= 1 && T > PH[1] + 0.9);
 tag(texTh, 'mu left', () => [sx(XA), B.bottom], 12, 0, () => phase >= 1 && T > PH[1] + 0.9);
-tag(`score <span class="n">${fmt(FW.llr, 3)}</span>`, 'ink left', () => [sx(1), sy(FW.llr)], 16, 0, () => phase === 3 ? (T > PH[3] + 0.3 ? 1 : 0) : phase === 4 ? 0.4 : 0);
-tag(`score <span class="n">${fmt(FC.llr, 3)}</span>`, 'ink left', () => [sx(1), sy(FC.llr)], 16, 0, () => phase === 4 && T > PH[4] + 3.1);
+tag(`score <span class="n">${fmt(FW.llr, 3)}</span>`, 'ink left score', () => [sx(1), sy(FW.llr)], () => narrow.matches ? -10 : 16, 0, () => phase === 3 ? (T > PH[3] + 0.3 ? 1 : 0) : phase === 4 ? 0.4 : 0);
+tag(`score <span class="n">${fmt(FC.llr, 3)}</span>`, 'ink left score', () => [sx(1), sy(FC.llr)], () => narrow.matches ? -10 : 16, 0, () => phase === 4 && T > PH[4] + 3.1);
 tag('threshold', 'mu right', () => [B.right, sy(TAU)], -2, -11, () => phase >= 1 && T > PH[1] + 0.9);
 
 
@@ -254,6 +277,7 @@ $('replay').addEventListener('click', () => { t0 = performance.now(); pausedAt =
 // when embedded in an iframe, report the content height to the parent page (the blog sizes each animation to its content)
 function postHeight() { const h = Math.ceil(document.querySelector('.wrap').getBoundingClientRect().height) + 4; try { if (parent !== window) parent.postMessage({ type: 'anim-height', h }, '*'); } catch (e) {} }
 addEventListener('load', postHeight); addEventListener('resize', postHeight); setTimeout(postHeight, 300);
+new ResizeObserver(postHeight).observe(document.querySelector('.wrap'));
 requestAnimationFrame(frame);
 })();
 

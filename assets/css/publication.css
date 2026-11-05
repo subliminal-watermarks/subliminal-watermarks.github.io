@@ -162,6 +162,31 @@ mjx-container[display="true"] { max-width: 100%; padding: 8px 0; overflow-x: aut
 table:not(.paper-table) { width: max-content; }
 mjx-container[display="true"] { min-width: 0 !important; }
 
-/* Embedded step-through animations (assets/anim/*.html). On phones they keep a legible minimum width and scroll sideways. */
-.anim-embed { margin: 28px 0 32px; overflow-x: auto; }
-.anim-embed iframe { display: block; width: 100%; min-width: 640px; aspect-ratio: 960 / 600; border: 0; }
+/* Each embed lays out its own contents at the available width and reports its height. */
+.anim-embed { margin: 28px 0 32px; min-width: 0; }
+.anim-embed iframe { display: block; width: 100%; max-width: 100%; min-width: 0; aspect-ratio: 960 / 600; border: 0; }
+.figure-link { display: block; cursor: zoom-in; }
+.figure-hint { display: none; }
+
+@media (max-width: 600px) {
+  .publication-header { padding-top: 28px; padding-bottom: 16px; }
+  .publication-title { font-size: clamp(28px, 7.5vw, 36px); }
+  .post-body { overflow-wrap: break-word; }
+  .post-body h2 { margin: 36px 0 20px; font-size: 25px; }
+  .post-body h3 { margin: 28px 0 20px; font-size: 21px; }
+  .notice--info, .notice--success { padding: 16px; margin-bottom: 24px; }
+  figure, .anim-embed { margin: 22px 0 26px; }
+  figure img { width: 100%; max-width: 100%; max-height: 65svh; object-fit: contain; }
+  .figure-hint { display: block; margin: 8px 0 0; font-size: 12px; }
+  .table-wrap { max-width: 100%; -webkit-overflow-scrolling: touch; }
+  table.paper-table { font-size: 13px; }
+  table.paper-table th, table.paper-table td { padding: 7px 8px; }
+  table.paper-table thead tr:first-child th:first-child,
+  table.paper-table tbody td:first-child {
+    position: sticky; left: 0; z-index: 1; background: #fff;
+    min-width: 104px; max-width: 132px; white-space: normal;
+  }
+  details.experiment-details { padding: 14px 12px; }
+  .setup-overview table:not(.paper-table) { min-width: 580px; }
+  .references { overflow-wrap: anywhere; }
+}

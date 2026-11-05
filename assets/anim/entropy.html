@@ -45,7 +45,10 @@ function heat(h) { const x = clamp(h / HMAX);
 stops.forEach(([o, c]) => el('stop', { offset: o, 'stop-color': `rgb(${c})` }, document.getElementById('heat')));
 
 const R = document.getElementById('root');
-const FS = 20, LH = 42, X0 = 40, XMAX = 920;
+function renderFigure(width) {
+R.replaceChildren();
+const mobile = width <= 600, VW = mobile ? width : 960;
+const FS = mobile ? 16 : 20, LH = mobile ? 30 : 42, X0 = mobile ? 10 : 40, XMAX = VW - X0;
 // lay out the real tokens (measured, so it works in every browser)
 function passage(y0, style) {
   const meter = el('text', { 'font-size': FS, x: -9999, y: -9999 }, R);
@@ -65,9 +68,10 @@ function passage(y0, style) {
 
 // ---- top: the trace coloured by the student's uncertainty before each token ----
 const A = passage(36, 'heat'), lastA = A[A.length - 1].y;
-const LY = lastA + 34, LW = 220;
+const LY = lastA + 30;
 const l1 = txt('Student’s uncertainty:', { x: X0, y: LY + 10, 'font-size': 13, fill: C.muted }, R), lx = X0 + l1.getComputedTextLength() + 12;
 const l2 = txt('sure', { x: lx, y: LY + 10, 'font-size': 13, fill: C.muted }, R), gx = lx + l2.getComputedTextLength() + 8;
+const LW = Math.min(220, Math.max(32, VW - gx - X0 - 52));
 el('rect', { x: gx, y: LY, width: LW, height: 12, rx: 3, fill: 'url(#heat)', stroke: '#e0e2e5' }, R);
 txt('unsure', { x: gx + LW + 8, y: LY + 10, 'font-size': 13, fill: C.muted }, R);
 
@@ -75,13 +79,34 @@ txt('unsure', { x: gx + LW + 8, y: LY + 10, 'font-size': 13, fill: C.muted }, R)
 const B = passage(LY + 70, 'mask'), lastB = B[B.length - 1].y;
 const KY = lastB + 40;
 el('rect', { x: X0, y: KY - 1, width: 34, height: 16, rx: 4, fill: 'url(#hatch)' }, R);
-txt('the most uncertain half of all training tokens: still read as context, but dropped from the loss', { x: X0 + 44, y: KY + 11, 'font-size': 13, fill: C.muted }, R);
+const note = txt('', { x: X0 + 44, y: KY + 11, 'font-size': 13, fill: C.muted }, R);
+const words = 'the most uncertain half of all training tokens: still read as context, but dropped from the loss'.split(' ');
+let line = '', noteLines = 1;
+const meter = txt('', { 'font-size': 13, x: -9999, y: -9999 }, R);
+// Use tspans so each wrapped line remains part of the same accessible label.
+for (const word of words) {
+  const candidate = line ? line + ' ' + word : word;
+  meter.textContent = candidate;
+  if (line && meter.getComputedTextLength() > VW - X0 * 2 - 44) {
+    const t = el('tspan', { x: X0 + 44, y: KY + 11 + (noteLines - 1) * 18 }, note); t.textContent = line;
+    noteLines++; line = word;
+  } else line = candidate;
+}
+const tail = el('tspan', { x: X0 + 44, y: KY + 11 + (noteLines - 1) * 18 }, note); tail.textContent = line;
+meter.remove();
 
 // fit the viewBox to the content
-const H = Math.ceil(KY + 26); document.getElementById('fig').setAttribute('viewBox', `0 0 960 ${H}`);
+const H = Math.ceil(KY + 26 + (noteLines - 1) * 18); document.getElementById('fig').setAttribute('viewBox', `0 0 ${VW} ${H}`);
+postHeight();
+}
 // tell the embedding page how tall this figure is (the content, not the frame)
 function postHeight() { const h = Math.ceil(document.querySelector('.wrap').getBoundingClientRect().height) + 4; try { if (parent !== window) parent.postMessage({ type: 'anim-height', h }, '*'); } catch (e) {} }
 addEventListener('load', postHeight); addEventListener('resize', postHeight); setTimeout(postHeight, 300);
+let lastWidth = 0;
+new ResizeObserver(entries => {
+  const width = Math.round(entries[0].contentRect.width);
+  if (width > 0 && width !== lastWidth) { lastWidth = width; renderFigure(width); }
+}).observe(document.querySelector('.wrap'));
 </script>
 </body>
 </html>

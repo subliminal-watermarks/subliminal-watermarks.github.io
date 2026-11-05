@@ -27,7 +27,7 @@ excerpt: "Robust watermark signals live in the parameter space and not the text,
 
 Are the current watermarking schemes robust against distillation attacks? We first introduce two simple techniques that beat all anti-distillation watermark detectors we tested: **grandchild** and **entropy laundering**. Inspired by subliminal learning, we suspect that the watermark signal may generalize better in **parameter space**, and introduce **Subliminal Watermark (SubWM)**, a new detection scheme that can identify distillation from a few sampled rollouts of a suspect model and remains effective after the laundering schemes. It measures "how much does the likelihood of this sequence increase if we shift our probe model's weights toward a watermarked one?" 
 
-On science questions, SubWM achieves about **99%** true positive rate (TPR) and **3%** false positive rate (FPR) per **single** query to the suspect. This also means that a simple majority vote over, say, 10 sampled rollouts is projected to detect distillation almost perfectly. On **long-horizon** coding tasks, the detection is more difficult, likely because code tokens have lower entropy, but SubWM still achieves above **65%** TPR at **5%** FPR. A majority vote over only 50 sampled rollouts again is projected to achieve almost perfect detection. To avoid data leakage, both the evaluation and threshold tuning are done on **held-out** prompts that neither SubWM nor the suspect has ever seen.
+On science questions, SubWM achieves about **99%** true positive rate (TPR) and **3%** false positive rate (FPR) per **single** query to the suspect. This also means that a simple majority vote over, say, 10 sampled rollouts is projected to detect distillation almost perfectly. On **long-horizon** coding tasks, the detection is more difficult, likely because code tokens have lower entropy, but SubWM still achieves above **65%** TPR at **5%** FPR. A majority vote over only 50 sampled rollouts again is projected to achieve almost perfect detection. To avoid data leakage, both the evaluation and threshold tuning are done on **held-out** prompts that neither SubWM nor the suspect has ever seen during training.
 </div>
 
 <figure class="anim-embed">
@@ -46,28 +46,28 @@ The standard tool is _watermarking_ ([Aaronson, 2022](#ref-aaronson2022)): embed
 
 Watermarking is also becoming a legal requirement. From 2026, the EU AI Act requires providers of generative AI systems, text generators included, to mark their outputs in a machine-readable format that is detectable as AI-generated ([European Union, 2024](#ref-euaiact2024), [European Commission, 2026](#ref-eccop2026)).
 
-The best example of a watermark is Aaronson's ([2022](#ref-aaronson2022)) Gumbel-Max watermark. The idea is simple: since there is intrinsic randomness in LLM sampling at non-zero temperature anyway, we could swap in pseudorandomness that can be deterministically verified later.
+One of the earliest examples of watermarking is Aaronson's ([2022](#ref-aaronson2022)) Gumbel-Max watermark. The idea is simple: since there is intrinsic randomness in LLM sampling at non-zero temperature anyway, we could swap in pseudorandomness that can be deterministically verified later.
 
 More concretely, we prepare an $$n$$-gram hash table: at each step, the previous $$n$$ tokens and a secret key $$k$$ are hashed into a seed, and the seed generates one pseudorandom number $$u_v \in (0,1)$$ for every token $$v$$ in the vocabulary. Given the model's next-token probabilities $$p_v$$, we return $$\arg\max_v u_v^{1/p_v}$$, the standard Gumbel-Max trick. Because the seed depends only on the preceding $$n$$ tokens and the key, one can recompute every $$u_v$$ afterwards with the key. 
 
-If you are not familiar with this, click on the keys below and see how it changes the model's output. You can also click on the blue tokens to see $$p_v$$ and $$u_v$$ explicitly.
+The widget below helps visualize the effect of key selection on the model's output.
 <div class="anim-embed">
 <iframe src="{{ '/assets/anim/gumbel.html' | relative_url }}" title="Interactive: how a secret key picks the next token in a Gumbel-Max watermark" loading="lazy"></iframe>
 </div>
-The point is, to anyone without the key, $$u$$ looks uniformly random, so each token is still chosen with probability $$p_v$$.
+To anyone without the key, $$u$$ looks uniformly random, so each token is still chosen with probability $$p_v$$.
 
 
 The detection in the original work computes the _textual_ correlation between sampled tokens $$y_t$$ and the pseudorandom numbers $$u_{y_t}$$ by $$ S(y) \;=\; \sum_{t=1}^{T} -\ln\big(1 - u^{(t)}_{y_t}\big).$$ Again, the number $$u_{y_t}$$ can be recomputed from the key $$k$$ and the preceding $$n$$ tokens. 
 
-Follow-ups, such as SynthID ([Dathathri et al., 2024](#ref-dathathri2024)) and TextSeal ([Sander et al., 2026](#ref-sander2026)), all work similarly but improve the quality-detectability tradeoff. Green/Red-list ([Kirchenbauer et al., 2023](#ref-kirchenbauer2023)) and ADFP work slightly differently, but we won't elaborate further. This is because none of these detection methods survives the simple attacks introduced in the next section, and once we switch to our new detection method, Subliminal Watermark (SubWM), even the vanilla Gumbel-Max watermark becomes detectable after the attacks.
+Follow-ups, such as SynthID ([Dathathri et al., 2024](#ref-dathathri2024)) and TextSeal ([Sander et al., 2026](#ref-sander2026)), all work similarly but improve the quality-detectability tradeoff. Green/Red-list ([Kirchenbauer et al., 2023](#ref-kirchenbauer2023)) and ADFP ([Xu et al., 2026](#ref-xu2026)) work slightly differently, but we won't elaborate further. This is because none of these detection methods survives the simple attacks introduced in the next section, and once we switch to our new detection method, Subliminal Watermark (SubWM), even the vanilla Gumbel-Max watermark becomes detectable after the attacks.
 
 ## 2. Two simple attacks beat previous detection methods {#laundering}
 
-Are the current watermarking schemes robust against smart distillers? Unfortunately, the answer is _no_. In fact, they don't even need sophisticated tricks, just an understanding of how LLM watermarks work from first principles. We introduce two simple attacks.
+Are the current watermarking schemes robust against smart distillers? Unfortunately, the answer is _no_. We introduce two simple attacks.
 
 **Grandchild laundering.** Train a *child* on the watermarked teacher traces as usual, but don't deploy it. Instead, sample the child on the same prompts, keep the correct answers, and train a fresh *grandchild* from the original checkpoint on those. The grandchild never sees a watermarked token.
 
-In the table below, we see the $$p$$-values for grandchildren are **orders of magnitude higher** than those of children, without losing much accuracy:
+In the table below, we see the $$p$$-values for grandchildren are **orders of magnitude higher** than those of children, **without** losing much accuracy:
 <!-- ADFP source: Gautham Govind Anil, #group-project, 2026-10-30.
 https://cs294288fa26.slack.com/archives/C0BUX23MV4K/p1793401181376409
 Closed-detector training-trace p-values only; clean training p-value and accuracy were not reported. -->
@@ -79,7 +79,7 @@ Closed-detector training-trace p-values only; clean training p-value and accurac
 </thead>
 <tbody>
 <tr><td>Child</td><td>\(4.7 \times 10^{-15}\)</td><td>81.2%</td><td class="gap"></td><td>\(1.3 \times 10^{-9}\)</td><td>69.3%</td><td class="gap"></td><td>\(8.8 \times 10^{-8}\)</td></tr>
-<tr><td>Grandchild</td><td class="hl">0.025</td><td>79.8%</td><td class="gap"></td><td class="hl">0.48</td><td>70.2%</td><td class="gap"></td><td class="hl">0.72</td></tr>
+<tr><td>Grandchild Laundering</td><td class="hl">0.025</td><td>79.8%</td><td class="gap"></td><td class="hl">0.48</td><td>70.2%</td><td class="gap"></td><td class="hl">0.72</td></tr>
 </tbody>
 </table>
 </div>
@@ -93,18 +93,24 @@ See the illustration below based on a real Qwen3.5-4B's response on a science qu
 </div>
 
 
-Despite the limitation of not having the teacher's entropy, entropy laundering is still very effective against TextSeal, SynthID, and ADFP. As shown in the table below, the $$p$$-values are again orders of magnitude higher.
+Despite the limitation of not having the teacher's entropy, entropy laundering is still very effective against TextSeal, SynthID, and ADFP. As shown in the table below, the $$p$$-values are again orders of magnitude higher without losing much accuracy.
+<!-- Entropy accuracy source: harshit/entropy-laundering at
+07283d269b87f60d7e55d30a40b64a463b860fe7,
+scripts/entropy_laundering/RESULTS.md and reported/accuracy_results.csv.
+The unmasked TextSeal accuracy is the team's sampled run on the same evaluation set. -->
 <div class="table-wrap">
 <table class="paper-table">
 <thead>
-<tr><th></th><th>SynthID</th><th>TextSeal</th><th>ADFP (\(\lambda = 64\))</th></tr>
+<tr><th rowspan="2">Student</th><th colspan="2">SynthID</th><th class="gap"></th><th colspan="2">TextSeal</th><th class="gap"></th><th colspan="2">ADFP (\(\lambda = 64\))</th></tr>
+<tr><th>\(p\)-value</th><th>Accuracy</th><th class="gap"></th><th>\(p\)-value</th><th>Accuracy</th><th class="gap"></th><th>\(p\)-value</th><th>Accuracy</th></tr>
 </thead>
 <tbody>
-<tr><td>Original</td><td>\(9.4 \times 10^{-7}\)</td><td>\(4.6 \times 10^{-9}\)</td><td>0.051</td></tr>
-<tr class="rule-above"><td>Highest-entropy 50%</td><td class="hl">0.62</td><td class="hl">0.22</td><td class="hl">0.93</td></tr>
+<tr><td>Original</td><td>\(9.4 \times 10^{-7}\)</td><td>82.9%</td><td class="gap"></td><td>\(4.6 \times 10^{-9}\)</td><td>83.2%</td><td class="gap"></td><td>0.051</td><td>55.9%</td></tr>
+<tr class="rule-above"><td>Entropy Laundering</td><td class="hl">0.62</td><td>82.4%</td><td class="gap"></td><td class="hl">0.22</td><td>81.4%</td><td class="gap"></td><td class="hl">0.93</td><td>73.9%</td></tr>
 </tbody>
 </table>
 </div>
+<p class="table-note">Accuracy is measured on 1,000 held-out science questions with thinking-mode sampling. The original TextSeal accuracy comes from an earlier sampled run on the same evaluation set with a different seed.</p>
 
 
 ## 3. SubWM: a novel, robust detection method in parameter space {#robust-detection}
@@ -131,7 +137,7 @@ In words:
 *How much more likely is the response if we shift the clean teacher toward the watermarked one in parameter space?*
 {: .key-idea}
 
-Crucially, the score can be computed very efficiently via **autodiff**. We just need one forward pass through the slightly perturbed weights $$\theta_c + \epsilon\Delta\theta$$ and then a backward pass to the scalar $$\epsilon$$. The gradients are _never materialized_. For those who like math, this is because our score is _not_ the cosine similarity between two gradients or two parameter-space directions, but the canonical pairing between one of each (or between the tangent space and the cotangent space if you wish). This is why we don't need to, e.g., normalize the gradients and $$\Delta\theta$$ in principle, or approximate the Hessian of the loss landscape.
+Crucially, the score can be computed very efficiently via **autodiff**. We just need one forward pass through the slightly perturbed weights $$\theta_c + \epsilon\Delta\theta$$ and then a backward pass to the scalar $$\epsilon$$. The gradients are _never materialized_. This is because our score is _not_ the cosine similarity between two gradients or two parameter-space directions, but the canonical pairing between one of each (or between the tangent space and the cotangent space if you wish). This is why we don't need to, e.g., normalize the gradients and $$\Delta\theta$$ in principle, or approximate the Hessian of the loss landscape.
 
 In fact, even without backprop, the finite-difference approximation already works well:
 
@@ -141,14 +147,13 @@ s(x, y) \;\approx\; \frac{1}{|y|} \log \frac{p_{\theta_w}(y \mid x)}{p_{\theta_c
 \end{equation}
 $$
 
-which is just the **mean log-likelihood ratio** (LLR) between the teacher checkpoints. Despite its strong performance in practice, this simple score is less interpretable in terms of linear parameter-space directions. We report both scores in the following.
+which is just the **mean log-likelihood ratio** (LLR) between the teacher checkpoints. Despite its strong performance in practice, this simple score is less interpretable in terms of linear parameter-space directions.
 
 
 ### 3.2 SubWM has great TPR and FPR on single responses, and even out of distribution
 
 All students in this post run in **thinking mode**, so SubWM scores the model's full chain of thought (many existing anti-distillation methods work poorly on long contexts). In particular, for agentic coding, each action is generated with up to about 29k tokens of the trajectory in context.
 
-On science questions, this is just to reiterate the results shown at the beginning:
 <figure class="anim-embed">
 <iframe src="{{ '/assets/anim/likelihood-line.html' | relative_url }}?final" title="Figure: real likelihood curves of held-out science answers from the clean teacher copy to the watermarked one (80 shown), and the histogram of all 1,600 scores (800 per student) against the fixed threshold. Flagged: 800 of 800 watermarked answers, 22 of 800 clean ones." loading="lazy"></iframe>
 </figure>
@@ -162,9 +167,12 @@ For agentic coding tasks, the task is a lot harder, likely because code tokens u
 
 ### 3.3 SubWM can work with two different keys at the same time 
 
-What if both OpenAI and Anthropic decide to use our watermarking scheme? Then we can detect not only distillation, but also the _source_ of distillation! With detectors for both key 1 and key 2, the contrast $$s_1 - s_2$$ of their scores **separates the key-1 and key-2 students perfectly** (AUROC 1.000 on 800 held-out prompts). All 800 key-1 responses have positive contrast, and all 800 key-2 responses have negative contrast.
+We can detect not only distillation, but also the _source_ of distillation! With detectors for both key 1 and key 2, the contrast $$s_1 - s_2$$ of their scores **separates the key-1 and key-2 students perfectly** (AUROC 1.000 on 800 held-out prompts). All 800 key-1 responses have positive contrast, and all 800 key-2 responses have negative contrast.
 <figure>
-  <img src="{{ '/assets/images/dw-prime-key-contrast.png' | relative_url }}" alt="Alignment-score contrast s1 minus s2 for the key-1, key-2, and clean students on the same 800 held-out prompts">
+  <a class="figure-link" href="{{ '/assets/images/dw-prime-key-contrast.svg' | relative_url }}" target="_blank" rel="noopener" aria-label="Open key-contrast figure at full size">
+    <img src="{{ '/assets/images/dw-prime-key-contrast.svg' | relative_url }}" width="994" height="446" loading="lazy" alt="Alignment-score contrast s1 minus s2 for the key-1, key-2, and clean students on the same 800 held-out prompts">
+  </a>
+  <figcaption class="figure-hint">Tap the figure to open it at full size.</figcaption>
 </figure>
 
 ### 3.4 SubWM is robust to laundering
@@ -172,7 +180,10 @@ What if both OpenAI and Anthropic decide to use our watermarking scheme? Then we
 We evaluate the entropy-laundered and grandchild students with the original detector, using the LLR score. On science questions, TPRs stay above 99% at below 3% FPR, essentially **the same as without laundering**. In agentic coding, grandchild laundering does not lower detection either (67% → 69% TPR at 4–6% FPR).
 
 <figure>
-  <img src="{{ '/assets/images/laundering-detection.png' | relative_url }}" alt="Dumbbell chart of LLR detection rates. Science: TPR 100%, 99.6% and 99.9% at FPR 2.8%, 2.9% and 1.9% for no laundering, entropy laundering and grandchild laundering. Agentic coding: TPR 67% and 69.3% at FPR 5.5% and 4.3% for no laundering and grandchild laundering.">
+  <a class="figure-link" href="{{ '/assets/images/laundering-detection.svg' | relative_url }}" target="_blank" rel="noopener" aria-label="Open laundering-detection figure at full size">
+    <img src="{{ '/assets/images/laundering-detection.svg' | relative_url }}" width="994" height="403" loading="lazy" alt="Dumbbell chart of LLR detection rates. Science: TPR 100%, 99.6% and 99.9% at FPR 2.8%, 2.9% and 1.9% for no laundering, entropy laundering and grandchild laundering. Agentic coding: TPR 67% and 69.3% at FPR 5.5% and 4.3% for no laundering and grandchild laundering.">
+  </a>
+  <figcaption class="figure-hint">Tap the figure to open it at full size.</figcaption>
 </figure>
 
 ### 3.5 SubWM could perfectly detect model distillation by majority vote {#model-detection}
@@ -184,10 +195,13 @@ If the rollouts are independent, the TPR and FPR of the vote follow from a simpl
 On coding tasks, we could increase the number of queries to $$N=50$$ (which is still very small) and expect near-perfect detection: for the agentic-coding lineage, $$N=50$$ gives a projected TPR of 99.1% without laundering and 99.7% after grandchild laundering, at a projected FPR below $$10^{-19}$$.
 
 <figure>
-  <img src="{{ '/assets/images/majority-vote.png' | relative_url }}" alt="Majority vote, LLR score. Science questions: one response gives TPR 100% and FPR 2.75% (1 in 36); a majority vote of 10 responses gives TPR 100% and FPR 1 in 12 million. Agentic coding: one action gives TPR 67% and FPR 5.5% (1 in 18); a majority vote of 50 actions gives TPR 99.1% and FPR 1 in 10^19.">
+  <a class="figure-link" href="{{ '/assets/images/majority-vote.svg' | relative_url }}" target="_blank" rel="noopener" aria-label="Open majority-vote figure at full size">
+    <img src="{{ '/assets/images/majority-vote.svg' | relative_url }}" width="720" height="295" loading="lazy" alt="Majority vote, LLR score. Science questions: one response gives TPR 100% and FPR 2.75% (1 in 36); a majority vote of 10 responses gives TPR 100% and FPR 1 in 12 million. Agentic coding: one action gives TPR 67% and FPR 5.5% (1 in 18); a majority vote of 50 actions gives TPR 99.1% and FPR 1 in 10^19.">
+  </a>
+  <figcaption class="figure-hint">Tap the figure to open it at full size.</figcaption>
 </figure>
 
-One caveat is that these numbers are **projected**. We haven't tested SubWM on multiple clean models and measured FPR directly, which is an important next step for us. In the meantime, we would like to emphasize that
+We haven't tested SubWM on multiple clean models and measured FPR directly, which is an important next step for us. In the meantime, we would like to emphasize that
 1. Our detector works on OOD tasks.
 2. Our detector is completely student-agnostic; from the training traces to threshold calibration, everything is agnostic to the distiller. 
 
@@ -379,7 +393,7 @@ Both keyed science detectors are complete on the three main science students. Ke
 
 - **Grandchild table.** For SynthID and TextSeal, the $$p$$-values use 3,000 traces the child trained on. The clean control gives SynthID 0.35 and TextSeal 0.82.
 - **ADFP.** The displayed grandchild $$p$$-values use the teacher's training traces. At teacher-trace prefixes, the evaluator samples the student's next token and measures its keyed green-list membership, keeping the first occurrence of each evaluated context bigram. The reported $$p$$-value is the one-sided Hoeffding bound: $$p = \exp[-2N(\bar g - \gamma)^2]$$ when $$\bar g > \gamma$$, and $$p = 1$$ otherwise, with green-list fraction $$\gamma = 0.5$$. Here $$N$$ is the number of retained measurements and $$\bar g$$ their mean. It is a corpus-level statistic, not a per-response FPR. The clean training $$p$$-value was not reported for this ADFP grandchild comparison.
-- **Entropy table.** Cells report the usual $$p$$-value. Detection is evaluated on training traces. The highest-entropy mask is selected over the full training corpus; dropped tokens remain in the context but contribute no SFT loss. Ablations: dropping a random 50% gives TextSeal $$1.5 \times 10^{-5}$$ and SynthID $$3.3 \times 10^{-4}$$; dropping the lowest-entropy 50% gives TextSeal $$5.2 \times 10^{-9}$$ and SynthID $$9.7 \times 10^{-7}$$. The clean control gives TextSeal 0.36 and SynthID 0.88.
+- **Entropy table.** Detection columns report the usual $$p$$-value, evaluated on training traces. Accuracy uses 1,000 held-out science MCQs with thinking-mode sampling (temperature 1, top-p 0.95, top-k 20, presence penalty 1.5, and a 2,048-token response limit). The original TextSeal accuracy is from the team's earlier sampled evaluation with a different seed. The highest-entropy mask is selected over the full training corpus; dropped tokens remain in the context but contribute no SFT loss. Ablations: dropping a random 50% gives TextSeal $$1.5 \times 10^{-5}$$ and SynthID $$3.3 \times 10^{-4}$$; dropping the lowest-entropy 50% gives TextSeal $$5.2 \times 10^{-9}$$ and SynthID $$9.7 \times 10^{-7}$$. The clean control gives TextSeal 0.36 and SynthID 0.88.
 
 </div>
 </details>
