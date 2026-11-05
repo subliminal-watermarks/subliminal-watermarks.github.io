@@ -1,12 +1,12 @@
 # Project page for the watermark-distillation project.
-# Served by GitHub Pages from the /docs folder of cs294-288-dcllms/fingerprint-sft
+# Served by GitHub Pages from the /docs folder of subliminal-watermarks/fingerprint-sft
 # (Settings -> Pages -> Deploy from a branch -> main, /docs).
 
 title: "[Method name TBD]"
 description: "Detecting watermark distillation from a single student response."
-url: "https://cs294-288-dcllms.github.io"
+url: "https://subliminal-watermarks.github.io"
 baseurl: "/fingerprint-sft"   # must match the repo name; change if the site moves
-repo_url: "https://github.com/cs294-288-dcllms/fingerprint-sft"
+repo_url: "https://github.com/subliminal-watermarks/fingerprint-sft"
 
 # Build settings (same stack as chang-han-chen.github.io)
 markdown: kramdown

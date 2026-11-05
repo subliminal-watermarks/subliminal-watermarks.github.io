@@ -29,4 +29,4 @@ bundle exec jekyll serve       # then open http://localhost:4000/fingerprint-sft
 3. The repo must be public for the page to be public: scan the git history for secrets
    (API keys, HF/W&B tokens) first.
 4. Repo Settings -> Pages -> Deploy from a branch -> `main`, folder `/docs`.
-   The site appears at https://cs294-288-dcllms.github.io/fingerprint-sft/
+   The site appears at https://subliminal-watermarks.github.io/fingerprint-sft/
