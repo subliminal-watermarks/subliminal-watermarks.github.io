@@ -13,7 +13,6 @@ kramdown:
   input: GFM
   math_engine: mathjax
   auto_ids: true
-  toc_levels: 2..3   # margin table of contents: sections and subsections
 highlighter: rouge
 timezone: America/Los_Angeles
 

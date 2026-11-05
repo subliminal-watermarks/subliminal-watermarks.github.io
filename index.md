@@ -30,13 +30,6 @@ Are the current watermarking schemes robust against distillation attacks? We fir
 On science questions, SubWM achieves about **99%** true positive rate (TPR) and **3%** false positive rate (FPR) per **single** query to the suspect. This also means that a simple majority vote over, say, 10 sampled rollouts is projected to detect distillation almost perfectly. On **long-horizon** coding tasks, the detection is more difficult, likely because code tokens have lower entropy, but SubWM still achieves above **65%** TPR at **5%** FPR. A majority vote over only 50 sampled rollouts again is projected to achieve almost perfect detection. To avoid data leakage, both the evaluation and threshold tuning are done on **held-out** prompts that neither SubWM nor the suspect has ever seen.
 </div>
 
-<div class="margin-toc" markdown="1">
-<p class="margin-toc-title">Contents</p>
-
-* TOC
-{:toc}
-</div>
-
 <figure class="anim-embed">
 <iframe src="{{ '/assets/anim/likelihood-line.html' | relative_url }}" title="Animation: how SubWM scores a response. The log-likelihood of a watermarked and a clean student's answer to the same science question is traced from the clean teacher copy to the watermarked one; each score is the rise at the watermarked copy, read against a fixed threshold. Then 80 real held-out answers, and the histogram of all 1,600 scores." loading="lazy"></iframe>
 </figure>
