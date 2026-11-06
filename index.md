@@ -78,8 +78,8 @@ Closed-detector training-trace p-values only; clean training p-value and accurac
 <tr><th>\(p\)-value</th><th>Accuracy</th><th class="gap"></th><th>\(p\)-value</th><th>Accuracy</th><th class="gap"></th><th>\(p\)-value</th></tr>
 </thead>
 <tbody>
-<tr><td>Child</td><td>\(4.7 \times 10^{-15}\)</td><td>81.2%</td><td class="gap"></td><td>\(1.3 \times 10^{-9}\)</td><td>69.3%</td><td class="gap"></td><td>\(8.8 \times 10^{-8}\)</td></tr>
-<tr><td>Grandchild Laundering</td><td class="hl">0.025</td><td>79.8%</td><td class="gap"></td><td class="hl">0.48</td><td>70.2%</td><td class="gap"></td><td class="hl">0.72</td></tr>
+<tr><td>Child</td><td>\(4.7 \times 10^{-15}\)</td><td>82.4%</td><td class="gap"></td><td>\(1.3 \times 10^{-9}\)</td><td>81.5%</td><td class="gap"></td><td>\(8.8 \times 10^{-8}\)</td></tr>
+<tr><td>Grandchild Laundering</td><td class="hl">0.025</td><td>84.2%</td><td class="gap"></td><td class="hl">0.67</td><td>78.2%</td><td class="gap"></td><td class="hl">0.72</td></tr>
 </tbody>
 </table>
 </div>
