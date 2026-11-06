@@ -74,12 +74,12 @@ Closed-detector training-trace p-values only; clean training p-value and accurac
 <div class="table-wrap">
 <table class="paper-table">
 <thead>
-<tr><th rowspan="2">Student</th><th colspan="2">SynthID</th><th class="gap"></th><th colspan="2">TextSeal</th><th class="gap"></th><th>ADFP (\(\lambda = 256\))</th></tr>
-<tr><th>\(p\)-value</th><th>Accuracy</th><th class="gap"></th><th>\(p\)-value</th><th>Accuracy</th><th class="gap"></th><th>\(p\)-value</th></tr>
+<tr><th rowspan="2">Student</th><th colspan="2">SynthID</th><th class="gap"></th><th colspan="2">TextSeal</th><th class="gap"></th><th colspan="2">ADFP (\(\lambda = 256\))</th></tr>
+<tr><th>\(p\)-value</th><th>Accuracy</th><th class="gap"></th><th>\(p\)-value</th><th>Accuracy</th><th class="gap"></th><th>\(p\)-value</th><th>Accuracy</th></tr>
 </thead>
 <tbody>
-<tr><td>Child</td><td>\(4.7 \times 10^{-15}\)</td><td>82.4%</td><td class="gap"></td><td>\(1.3 \times 10^{-9}\)</td><td>81.5%</td><td class="gap"></td><td>\(8.8 \times 10^{-8}\)</td></tr>
-<tr><td>Grandchild Laundering</td><td class="hl">0.025</td><td>84.2%</td><td class="gap"></td><td class="hl">0.67</td><td>78.2%</td><td class="gap"></td><td class="hl">0.72</td></tr>
+<tr><td>Child</td><td>\(4.7 \times 10^{-15}\)</td><td>82.4%</td><td class="gap"></td><td>\(1.3 \times 10^{-9}\)</td><td>81.5%</td><td class="gap"></td><td>\(2.2 \times 10^{-5}\)</td><td>41.6%</td></tr>
+<tr><td>Grandchild Laundering</td><td class="hl">0.025</td><td>84.2%</td><td class="gap"></td><td class="hl">0.67</td><td>78.2%</td><td class="gap"></td><td class="hl">1.0</td><td>49.4%</td></tr>
 </tbody>
 </table>
 </div>
