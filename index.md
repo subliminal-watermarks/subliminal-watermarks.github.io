@@ -297,6 +297,7 @@ It is interesting to investigate what exactly the models learn from watermarked 
 
 ## Citation {#citation}
 
+{% raw %}
 ```bibtex
 @misc{anil2026subliminalwatermarks,
   author = {Anil, Gautham Govind and Chavan, Arnav and Chen, Chang-Han and
@@ -307,6 +308,7 @@ It is interesting to investigate what exactly the models learn from watermarked 
   note   = {Blog post}
 }
 ```
+{% endraw %}
 
 ## References
 
