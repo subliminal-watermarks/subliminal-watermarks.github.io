@@ -295,6 +295,19 @@ This seems to suggest two things. First, detectors based on the watermark's samp
 
 It is interesting to investigate what exactly the models learn from watermarked traces, and why it is universal across models of different sizes (4B and 9B in our case). We expect some techniques from the subliminal learning literature would be useful, but we leave that to future work.
 
+## Citation {#citation}
+
+```bibtex
+@misc{anil2026subliminalwatermarks,
+  author = {Anil, Gautham Govind and Chavan, Arnav and Chen, Chang-Han and
+            Varma, Harshit and Keutzer, Kurt and Dimakis, Alex and Min, Sewon},
+  title  = {{Subliminal Watermarks}: robust and sample efficient distillation detection},
+  year   = {2026},
+  url    = {https://subliminal-watermarks.github.io/},
+  note   = {Blog post}
+}
+```
+
 ## References
 
 <div class="references" markdown="1">
