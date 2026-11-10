@@ -356,7 +356,7 @@ The science experiments use the same teacher and student: **Qwen3.5-9B → Qwen3
 | Coding (LiveCodeBench) | <span class="score-label" markdown="span">LLR $$\eqref{eq:llr}$$</span> | 354/396 (89.39%) | 23/396 (5.81%) |
 | Coding (LiveCodeBench) | <span class="score-label" markdown="span">Alignment $$\eqref{eq:score}$$</span> | 293/396 (73.99%) | 6/396 (1.52%) |
 
-*Cutoffs: the 951st-smallest clean-teacher score, flag if strictly greater. GSM8K: 1,000 clean teacher answers on the same 1,000-question file that holds the 800 test questions (the questions overlap; the responses come from a different model). LiveCodeBench: 168 clean teacher answers (4 per problem) on 42 calibration problems, disjoint from the 99 test problems (4 answers each, 396 in total).*
+*Cutoffs: the $$(\lfloor 0.95\,n \rfloor + 1)$$-th smallest of the $$n$$ clean-teacher scores (the 951st-smallest for $$n = 1{,}000$$; the 160th-smallest of the 168 LiveCodeBench answers), flag if strictly greater. GSM8K: 1,000 clean teacher answers on the same 1,000-question file that holds the 800 test questions (the questions overlap; the responses come from a different model). LiveCodeBench: 168 clean teacher answers (4 per problem) on 42 calibration problems, disjoint from the 99 test problems (4 answers each, 396 in total). The LiveCodeBench calibration answers are clustered (4 per problem, so roughly 42 independent units), which makes that cutoff noisier than the science and GSM8K ones.*
 
 **Key specificity (§3.3).**
 
