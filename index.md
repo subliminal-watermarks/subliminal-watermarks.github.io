@@ -16,6 +16,10 @@ authors:
   - name: Harshit Varma
     url: https://hrshtv.github.io/
     equal: true
+  - name: Kurt Keutzer
+    url: https://keutzer.github.io/
+  - name: Alex Dimakis
+    url: https://people.eecs.berkeley.edu/~alexdimakis/
   - name: Sewon Min
     url: https://www.sewonmin.com/
 equal_note: "Equal contribution, listed in alphabetical order"
