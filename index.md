@@ -314,21 +314,21 @@ It is interesting to investigate what exactly the models learn from watermarked 
 
 <div class="references" markdown="1">
 
-- {: #ref-aaronson2022} Scott Aaronson. [My AI safety lecture for UT Effective Altruism](https://scottaaronson.blog/?p=6823). *Shtetl-Optimized* (blog), November 2022.
-- {: #ref-adenali2026} Ishaq Aden-Ali, Noah Golowich, Allen Liu, Abhishek Shetty, Ankur Moitra, and Nika Haghtalab. [Subliminal effects in your data: A general mechanism via log-linearity](https://arxiv.org/abs/2602.04863). arXiv:2602.04863, 2026.
-- {: #ref-anthropic2026} Anthropic. [Detecting and preventing distillation attacks](https://www.anthropic.com/news/detecting-and-preventing-distillation-attacks). February 2026.
-- {: #ref-blank2026} Camila Blank, Agam Bhatia, Senthooran Rajamanoharan, Arthur Conmy, and Neel Nanda. [Subliminal learning is steering vector distillation](https://arxiv.org/abs/2606.00995). arXiv:2606.00995, 2026.
-- {: #ref-cloud2025} Alex Cloud, Minh Le, James Chua, Jan Betley, Anna Sztyber-Betley, Jacob Hilton, Samuel Marks, and Owain Evans. [Subliminal learning: Language models transmit behavioral traits via hidden signals in data](https://arxiv.org/abs/2507.14805). arXiv:2507.14805, 2025.
-- {: #ref-dathathri2024} Sumanth Dathathri, Abigail See, Sumedh Ghaisas, et al. [Scalable watermarking for identifying large language model outputs](https://www.nature.com/articles/s41586-024-08025-4). *Nature* 634, 818–823, 2024.
-- {: #ref-eccop2026} European Commission. [Code of Practice on marking and labelling of AI-generated content](https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content). June 2026.
-- {: #ref-euaiact2024} European Union. [Regulation (EU) 2024/1689 (Artificial Intelligence Act)](https://eur-lex.europa.eu/eli/reg/2024/1689/oj), Article 50. *Official Journal of the European Union*, 2024.
-- {: #ref-openr1-2025} Hugging Face. [Mixture-of-Thoughts](https://huggingface.co/datasets/open-r1/Mixture-of-Thoughts), a dataset from [Open R1: A fully open reproduction of DeepSeek-R1](https://github.com/huggingface/open-r1). 2025.
-- {: #ref-kirchenbauer2023} John Kirchenbauer, Jonas Geiping, Yuxin Wen, Jonathan Katz, Ian Miers, and Tom Goldstein. [A watermark for large language models](https://arxiv.org/abs/2301.10226). *ICML*, 2023.
-- {: #ref-ma2026} Li Ma. [Predictive likelihood ratios for language model watermark detection](https://arxiv.org/abs/2609.15657). arXiv:2609.15657, 2026.
-- {: #ref-qwen2026} Qwen Team. [Qwen3.5: Towards native multimodal agents](https://qwen.ai/blog?id=qwen3.5). February 2026.
-- {: #ref-sander2026} Tom Sander, Hongyan Chang, Tomáš Souček, et al. [TextSeal: A localized LLM watermark for provenance & distillation protection](https://arxiv.org/abs/2605.12456). arXiv:2605.12456, 2026.
-- {: #ref-schrodi2026} Simon Schrodi, Elias Kempf, Fazl Barez, and Thomas Brox. [Towards understanding subliminal learning: When and how hidden biases transfer](https://arxiv.org/abs/2509.23886). *ICLR*, 2026.
-- {: #ref-xu2026} Yixuan Even Xu, John Kirchenbauer, Yash Savani, Asher Trockman, Alexander Robey, Tom Goldstein, Fei Fang, and J.&nbsp;Zico Kolter. [Antidistillation fingerprinting](https://arxiv.org/abs/2602.03812). arXiv:2602.03812, 2026.
+1. {: #ref-aaronson2022} Scott Aaronson. [My AI safety lecture for UT Effective Altruism](https://scottaaronson.blog/?p=6823). *Shtetl-Optimized* (blog), November 2022.
+1. {: #ref-adenali2026} Ishaq Aden-Ali, Noah Golowich, Allen Liu, Abhishek Shetty, Ankur Moitra, and Nika Haghtalab. [Subliminal effects in your data: A general mechanism via log-linearity](https://arxiv.org/abs/2602.04863). arXiv:2602.04863, 2026.
+1. {: #ref-anthropic2026} Anthropic. [Detecting and preventing distillation attacks](https://www.anthropic.com/news/detecting-and-preventing-distillation-attacks). February 2026.
+1. {: #ref-blank2026} Camila Blank, Agam Bhatia, Senthooran Rajamanoharan, Arthur Conmy, and Neel Nanda. [Subliminal learning is steering vector distillation](https://arxiv.org/abs/2606.00995). arXiv:2606.00995, 2026.
+1. {: #ref-cloud2025} Alex Cloud, Minh Le, James Chua, Jan Betley, Anna Sztyber-Betley, Jacob Hilton, Samuel Marks, and Owain Evans. [Subliminal learning: Language models transmit behavioral traits via hidden signals in data](https://arxiv.org/abs/2507.14805). arXiv:2507.14805, 2025.
+1. {: #ref-dathathri2024} Sumanth Dathathri, Abigail See, Sumedh Ghaisas, et al. [Scalable watermarking for identifying large language model outputs](https://www.nature.com/articles/s41586-024-08025-4). *Nature* 634, 818–823, 2024.
+1. {: #ref-eccop2026} European Commission. [Code of Practice on marking and labelling of AI-generated content](https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content). June 2026.
+1. {: #ref-euaiact2024} European Union. [Regulation (EU) 2024/1689 (Artificial Intelligence Act)](https://eur-lex.europa.eu/eli/reg/2024/1689/oj), Article 50. *Official Journal of the European Union*, 2024.
+1. {: #ref-openr1-2025} Hugging Face. [Mixture-of-Thoughts](https://huggingface.co/datasets/open-r1/Mixture-of-Thoughts), a dataset from [Open R1: A fully open reproduction of DeepSeek-R1](https://github.com/huggingface/open-r1). 2025.
+1. {: #ref-kirchenbauer2023} John Kirchenbauer, Jonas Geiping, Yuxin Wen, Jonathan Katz, Ian Miers, and Tom Goldstein. [A watermark for large language models](https://arxiv.org/abs/2301.10226). *ICML*, 2023.
+1. {: #ref-ma2026} Li Ma. [Predictive likelihood ratios for language model watermark detection](https://arxiv.org/abs/2609.15657). arXiv:2609.15657, 2026.
+1. {: #ref-qwen2026} Qwen Team. [Qwen3.5: Towards native multimodal agents](https://qwen.ai/blog?id=qwen3.5). February 2026.
+1. {: #ref-sander2026} Tom Sander, Hongyan Chang, Tomáš Souček, et al. [TextSeal: A localized LLM watermark for provenance & distillation protection](https://arxiv.org/abs/2605.12456). arXiv:2605.12456, 2026.
+1. {: #ref-schrodi2026} Simon Schrodi, Elias Kempf, Fazl Barez, and Thomas Brox. [Towards understanding subliminal learning: When and how hidden biases transfer](https://arxiv.org/abs/2509.23886). *ICLR*, 2026.
+1. {: #ref-xu2026} Yixuan Even Xu, John Kirchenbauer, Yash Savani, Asher Trockman, Alexander Robey, Tom Goldstein, Fei Fang, and J.&nbsp;Zico Kolter. [Antidistillation fingerprinting](https://arxiv.org/abs/2602.03812). arXiv:2602.03812, 2026.
 
 </div>
 
